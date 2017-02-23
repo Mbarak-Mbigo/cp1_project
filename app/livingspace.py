@@ -3,5 +3,5 @@
 # imports
 from .room import Room
 
-class LivingSpace(Room):
+class LivingSpace(object):
     pass
