@@ -2,47 +2,37 @@
 
 # imports
 from abc import ABCMeta, abstractmethod
+
+
 class Room(object):
-    
-    #make room an abstract class
+    """docstring for Room
+        abstract class 
+    """
     __metaclass__ = ABCMeta
     
-    OFFICE_MAX_CAPACITY = 6
-    LIVING_SPACE_MAX_CAPACITY = 4
-    total_office_space = 0
-    total_living_space = 0
-    def __init__(self, room_id=1, description=None, type=None):
-        self.room_id = room_id
-        self.type =type         # only accept office or living_space
-        self.description = description
-        self.spaces = []
-    
-    @staticmethod
-    def add_office_space():
-        pass
-    
-    @staticmethod
-    def update_office_space():
-        pass
-    
-    @staticmethod
-    def add_living_space():
-        pass
-    
-    @staticmethod
-    def update_living_space():
-        pass
-    
-    
-    @abstractmethod
-    def room_type(self):
-        """"
-        return the room type of room
-        """
-        
+    def __init__(self, name, type):
+        self.room_id = id(self)
+        self.name = name
+        self.type =type         # only accept Office or Living Space
+        self.occupants = []
+           
     def is_fully_occupied(self):
         pass
         """"return true if full and false otherwise"""
+
+class Office(Room):
+    """docstring for Office"""
+    MAX_CAPACITY = 6
+    def __init__(self, *args, **kwargs):
+        self.occupants = []
+        super(Office, self).__init__(*args, **kwargs)
+
+class LivingSpace(Room):
+    """docstring for LivingSpace"""
+    def __init__(self, *args, **kwargs):
+        self.occupants = []
+        super(LivingSpace, self).__init__(*args, **kwargs)
+        
         
         
         
