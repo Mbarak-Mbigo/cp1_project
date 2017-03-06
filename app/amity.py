@@ -9,7 +9,7 @@ class Amity(object):
     def create_room(self,type, rooms=[]):
         """"
         room type:String values: "Office"| "Living Space"
-        Scenarios: What if type not string, string but not among options
+        Scenarios: Input not in specified options
             raise exception ValueError
         
         rooms type: String List values: Room names
@@ -20,8 +20,8 @@ class Amity(object):
                 raise exception ValueError
             non-empty and data is string
                 create room(s), update number of rooms
+                return room created
         """
-        pass
     
     def add_person(self,type, name, wants_accommodation='N'):
         """"
@@ -55,33 +55,84 @@ class Amity(object):
     
     def reallocate_person(self, person_id, new_room_name):
         """"
-        reallocate the person with person_id provided to the
-        new_room_name (unallocate, then reallocate
-        what if person does not exist?
-        What if person is staff?
-        What if person is fellow?
-            office space
-            living space
-        What if room does not exist?
-        what if room is fully occupied?
+        person_id: id   values: list of ids in person
+        Scenario:
+            Id not in valid range
+            Id in range
+                Person unallocated
+                    raise an exception
+                Person allocated
+                    Person Staff
+                        reallocate living space
+                            raise exception (type???)
+                        reallocate office
+                            space not available
+                                raise exception/ print error msg???
+                            space available
+                                reallocate
+                    Person Fellow
+                        Reallocate living space
+                            space not available
+                                raise exception/ print error msg???
+                            space available
+                                reallocate
+                                    do updates
+                        Reallocate office space
+                            Space not available
+                                raise exception/ print error msg???
+                            space available
+                                reallocate
+                                    do updates
+
+            new_room_name: room values: names from rooms
+            Scenario:
+                Room name not among those in room pool
+                    raise exception
+                Room among those in pool
+                    room fully occupied
+                        raise exception
+                    room not fully occupied
+                        person staff room living space
+                            raise exception
+
         """
         pass
     
     def load_people(self, filename):
         """"
-        Add people to rooms from a text file
-        File exists
-        File does not exist
-        File is empty
-        File has correct content
+        filename: txt file  values: person names and details
+        Scenario:
+            File does not exist
+                raise exception file not exist
+            File Exists
+                file type not txt
+                    raise exception
+                file type txt
+                    No data
+                        Raise exception
+                    Data exists
+                            Unkown format
+                                raise exception
+                            data format okay
+                                perform load operation
+
         """
         pass
     
     def print_allocations(self, outfile=None):
         """"
-        print a list of rooms and the people allocated into them
-        if outfile provided output list to the file ( what if
-        the file does not exist? create one or?
+        print to the screen a list of rooms and the people allocated into them
+        if outfile provided output list to the file  as well
+        
+        Scenario:
+        No rooms or rooms available but no allocations yet
+            raise exception
+        Rooms available allocations okay
+            outfile provided
+                print to screen and file
+            outfile not provided 
+                print to screen
+
         """
         pass
     
@@ -89,33 +140,74 @@ class Amity(object):
         """"
         print a list of all unallocated people on the screen
         if outfile is provided, output the list to the file
-        provided (what if the file does not exist? create one or?)
-        all staff with office attribute None
-        all fellows with office none, and livingspace N
+        
+        Scenario:
+        No person
+            responde accordingly
+        People available
+            No one unallocated
+                handle accordingly
+            Office
+                fellows 
+                staff
+            living space
+                fellows
+
+        outfile provided
+            output to file too.
         """
+
         pass
     
     def print_room(self, room_name):
         """"
         Given a room name, print all the people allocated to
         that room
+
+        Scenarios:
+        room not in pool
+            raise exception
+        room in pool
+            no allocations
+                handle accordingly
+            allocations available
+                display allocations
         """
         pass
 
-    def save_state(self, database=None):
+    def save_state(self, database="default-db"):
         """"Persists all that in the application onto an
             SQLite database"""
         pass
         
     def load_state(self, database=None):
         """"Loads data from the provided database into the
-        application for use"""
+        application for use
+        
+        Scenarios:
+        db provided does not exist
+            raise exception
+        db exists
+            no data
+                raise exception
+            data exists
+                unkown format
+                    raise exception
+                known format
+                    load data
+                        unsuccessful
+                            raise error
+                        successful
+                            load data
+        """
         pass
     
     #added functionality
     def print_available_space(self):
         """
         print all rooms and spaces available on each room (unallocated space)
+        Scenarios:
+
         """
         pass
         
@@ -135,29 +227,68 @@ class Amity(object):
         """
         pass
 
-    def get_random_room(self):
+    def get_random_room(self, type=None):
         """ 
         Scenario: 
-            No rooms: No room has been created or 
-            All available rooms are fully occupied
-        Using a random function,
-         Pools of rooms
-            Not fully occuppied
-                Office
-                Living Space
-            return room object or None
+        No rooms
+            raise exception
+        Rooms available
+            type: none
+                consider all categories (office/living space)
+            type: Office
+                consider office category
+            type: Living Space
         """
         pass
     
-    def search_rooms(self, type=None, room_name=[]):
+    def search_room(self, room_name, type=None):
         """
         search for room(s) in Amity
         if no input is provided, return the whole list of rooms
+        Scenario:
+        type: None
+            consider searching all categories (office and living space)
+        type: Office
+            consider searching office category
+        type: Living Space
+            consider searching living space
+        type: other
+            raise exception
+
+        room_name: 
+            Not a string
+                raise exception
+            string
+                not found
+                    raise exception
+                found
+                    return room object
         """
         pass
 
-    def search_person(self, type=None, person_name=None):
-        """Seach for a person in Amity return None or person object"""
+    def search_person(self, person_name, type=None):
+        """
+        Seach for a person in Amity return None or person object
+        Scenario:
+        type: None
+            consider person domain (all staff and fellow)
+        type: Fellow
+            consider fellow domain
+        type: Staff
+            consider staff domain
+        type: other
+            raise exception
+
+        person_name
+            not string
+                raise exception
+            string
+                not found
+                    raise exception
+                found
+                    return person object
+        
+        """
         pass
 
 
