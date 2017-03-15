@@ -1,40 +1,42 @@
+# amity_refactor.py
+
 # app/amity.py
 # TODO integrate app with docopt
 from random import choice
 
 # local imports
-from app.room import office, LivingSpace
-from app.person import Staff, Fellow
+from room import office, LivingSpace
+from person import Staff, Fellow
 
 
 class Amity(object):
-    accommodation = None
     all_rooms = []
     all_persons = []
         
-    def create_room(self,room_type, rooms):
-        """Create room(s).
-        create_room <room_name>... - Creates rooms in Amity. 
-        Using this command I should be able to create as 
-        many rooms as possible by specifying multiple room
-         names after the create_room command.
-        Args:
-            room_type: type of room (office|Living).
-            rooms: A list of room names (any string)
-        Returns:
-            Room(s) created.
-        Raises:
-            TypeError: if rooms not a list.
-            ValueError: if rooms not strings
-            ValueError: if room_type type not in (office| Living).
+    def create_room(self,room_type, rooms=[]):
+        """"
+        room type:String values: "office"| "Living"
+        Scenarios: Input not in specified options
+            raise exception ValueError
+        
+        rooms type: String List values: Room names
+        Scenarios: 
+            Empty list
+                raise Exception ValueError
+            Non-empty but has one or more non-string data
+                raise exception ValueError
+            non-empty and data is string
+                create room(s), update number of rooms
+                return room created
+            
         """
         try:
             if room_type not in ["office", "Living"]:
                 raise ValueError("Invalid room type, it should be office or Living")
             elif not isinstance(rooms, list):
-                raise TypeError("Provide a list of room name(s)")
-            elif len(rooms)== 0 or not all(isinstance(x, str) for x in rooms):
-                raise ValueError("Room names are supposed to be non-empty strings")
+                raise TypeError("Provide a list of room name")
+            elif not all(isinstance(x, str) for x in rooms):
+                raise ValueError("Room should be string")
                 
         except (ValueError,TypeError) as e:
             return e
@@ -43,51 +45,57 @@ class Amity(object):
                 for room in rooms:
                     if len(self.search_rooms(room)) == 0:
                         self.all_rooms.append(office(room, room_type))
-                return self.all_rooms[-1]
             else:
                 for room in rooms:
                     if len(self.search_rooms(room)) == 0:
                         self.all_rooms.append(LivingSpace(room, room_type))
-                return self.all_rooms[-1]
 
     
     def add_person(self, name, type, wants_accommodation='N'):
-        """Create a person, add to system, allocate to random room
-        add_person <person_name> <FELLOW|STAFF> [wants_accommodation] - 
-        Adds a person to the system and allocates the person to a random room. 
-        wants_accommodation here is an optional argument which can be either Y or N. 
-        The default value if it is not provided is N.
-        
-        Args:
-            name: person name (string)
-            type: person type (FELLOW | STAFF)
-            wants_accommodation: ('Y' | 'N')
-        Returns:
-            Person created Object
-        Raises:
-            ValueError: if name not string
-            ValueError: if type not in specified domain
-            ValueError: if wants_accommodation not in specified domain
-            PermissonError: if type is STAFF and wants_accommodation is 'Y'
+        """"
+        type: String values: "Staff" | "Fellow"
+        Scenario: Input not in specified options
+            raise exception ValueError
+
+        name: String values: person name
+        Scenario: Input not string
+            raise exception ValueError
+
+        wants_accommodation: String Character values: "N" | "Y"
+        Scenarios: Input not in specified options
+            raise exception ValueError
+
+        create person (add to amity: r/ship=> Aggregation)and 
+        allocate them to a random room 
+            {consume get_random_room to get random room}
+
+        Add person to the system,
+            create person
+            add to system amity
+        allocate the person to a random room
+            if Staff allocate office space
+            if Fellow and wants_accommodation is Yes
+            allocate both office and Living
+            return person added
+            or Raise exception
         """
         try:
             person = None
             if not isinstance(name, str):
                 raise ValueError("Person name can only be a string")
-            elif type not in ["STAFF", "FELLOW"]:
+            elif type not in ["Staff", "Fellow"]:
                 raise ValueError("Person type can only be Staff or Fellow")
             elif wants_accommodation not in ["Y", "N"]:
                 raise ValueError("Wants accommodation can only be 'Y' or 'N' ")
             elif not isinstance(name, str):
                 raise ValueError("Person name can only be a string")
-            elif type == "STAFF" and wants_accommodation == "Y":
+            elif type == "Staff" and wants_accommodation == "Y":
                 raise PermissionError("Staff cannot request for accommodation in Amity")
         except (ValueError, PermissionError) as e:
-            return e
+            print (e)
         else:
-            accommodation = wants_accommodation
             if len(self.search_person(name)) == 0:
-                if type == "STAFF":
+                if type == "Staff":
                     self.all_persons.append(Staff(name, type))
                     person = self.all_persons[-1]
                 else:
@@ -99,63 +107,55 @@ class Amity(object):
                 # room = self.get_random_room()
                 #  fellow: office|Living
                 # staff: office
-                self.allocate_room(person.id)
+                self.allocate_room(person[0].id)
+                
         finally:
             pass
     
     def reallocate_person(self, person_id, new_room_name):
-        """Reallocate a person from one room to another
-        reallocate_person <person_identifier> <new_room_name> - 
-        Reallocate the person with person_identifier to new_room_name.
-        
-        Args: 
-            person_id: (fellow | Staff)
-            new_room_name: a valid room 
+        """"
+        person_id: id   values: list of ids in person
+        Scenario:
+            Id not in valid range
+            Id in range
+                Person unallocated
+                    raise an exception
+                Person allocated
+                    Person Staff
+                        reallocate Living
+                            raise exception (type???)
+                        reallocate office
+                            space not available
+                                raise exception/ print error msg???
+                            space available
+                                reallocate
+                    Person Fellow
+                        Reallocate Living
+                            space not available
+                                raise exception/ print error msg???
+                            space available
+                                reallocate
+                                    do updates
+                        Reallocate office space
+                            Space not available
+                                raise exception/ print error msg???
+                            space available
+                                reallocate
+                                    do updates
 
-        Returns:
-            Reallocated person
+            new_room_name: room values: names from rooms
+            Scenario:
+                Room name not among those in room pool
+                    raise exception
+                Room among those in pool
+                    room fully occupied
+                        raise exception
+                    room not fully occupied
+                        person staff room Living
+                            raise exception
 
-        Raises:
-            ValueError: if person_id or new_room_name does not exist in System
-            NotImplementedError: if unallocated person is reallocated
-                                 if staff being reallocated to Living
-                                 if person being reallocated from one type to another
-            SystemError: if no rooms available for rellocation
-
-            ******handle for livingspace and office
         """
-        try:
-            current_room = None
-            person = next((person for person in self.all_persons if person.id == person_id),None)
-            reallocate_room = next((room for room in self.all_rooms if room.name == new_room_name),None)
-            current_room = next((room_name for room in self.all_rooms if room.room_id == person.office_space),None)
-            
-            if person.type is "STAFF" and reallocate_room.type is "Living":
-                raise NotImplementedError("Staff cannot be reallocated to Living")
-            elif person.office_space is "None" and reallocate_room.type is "office":
-                raise ValueError("Allocate office space first before reallocating")
-            elif person.type is "FELLOW" and reallocate_room.type is "Living":
-                if person.livingspace is None:
-                    raise ValueError("Allocate livingbefore reallocating")
-                else:
-                    current_room = next((room for room in self.all_rooms if room.room_id == person.livingspace),None)
-            elif len(self.all_rooms) <= 1 or len(self.all_rooms) ==2 and len(self.search_rooms("office"))==1: 
-                raise ValueError("No Space to reallocate")
-
-
-        except (ValueError, NotImplementedError) as e:
-            return e
-        else:
-            if reallocate_room.type is "office" and current_room.type is "office":
-                current_room.occupants.remove(person.id)
-                reallocate_room.occupants.append(person_id)
-                person.office_space = reallocate_room.room_id
-            elif reallocate_room.type is "Living" and current_room is "Living":
-                current_room.occupants.remove(person_id)
-                reallocate_room.occupants.append(person_id)
-                person.livingspace = reallocate_room.room_id
-        finally:
-            pass
+        pass
     
     def load_people(self, filename):
         """"
@@ -232,16 +232,7 @@ class Amity(object):
             allocations available
                 display allocations
         """
-        try:
-            room =next((room for room in self.all_rooms if room.name == room_name),None) 
-            if room is None:
-                raise ValueError("No room with name: %s" %room_name)
-        except Exception as e:
-            raise
-        else:
-            return room.occupants
-        finally:
-            pass
+        pass
 
     def save_state(self, database="default-db"):
         """"Persists all that in the application onto an
@@ -295,27 +286,18 @@ class Amity(object):
             if type(person_id) is not int:
                 raise TypeError("Invalid person Id type")
         except TypeError as e:
-            return e
+            print (e)
         else:
-            person = next((person for person in self.all_persons if person.id == person_id),None)
-            if person is not None:
-                # allocate office space
-                office = self.get_random_room("office")
-                if office is not None:
-                    office.occupants.append(person.name)
-                    person.office_space = office.room_id
-                    return "Allocation Successful"
-
-                if person.type == "FELLOW" and accommodation == 'Y':
-                    living_space = get_random_room("Living")
-                    if living_space is not None:
-                        living_space.occupants.append(person.name)
-                        person.livingspace = living_space.room_id
-                        return "Allocation Successful"
-
-                
+            person = [person for person in self.all_persons if person.id == person_id]
+            if isinstance(person, list) and len(person)==1:
+                print("Yaaaaay! person found! id= %d" % person[0].id)
+                # verified person is in the system
+                if person[0].type == "Staff":
+                    print("Person is staff allocate office space")
+                else:
+                    print("Person is Fellow")
             else:
-                print("Cannot assign space for person not in the system")
+                print("Oops no person found with id: %d" % person_id)
         finally:
             pass
 
@@ -342,12 +324,12 @@ class Amity(object):
         else:
             # no rooms created yet
             if len(self.all_rooms)==0:
-                return None
+                return []
             else:
                 room_pool = [room for room in self.all_rooms if room.type == type and room.name is not current_room]
                 # no rooms to reallocate to (available room is the one already allocated to)
                 if len(room_pool) == 0:
-                     return None
+                     return []
                 else:
                     return choice(room_pool)
         finally:
@@ -446,7 +428,63 @@ class Amity(object):
             elif isinstance(first_search_term, str) and second_search_term == None:
                 return [person for person in self.all_persons if person.name == first_search_term]
 
+
     
 
 
-    
+
+
+
+# trail.py code
+# # # facility/app/trial.py
+
+# # try:
+# #     age = int(input("Please enter your age: "))
+# # except Exception as err:
+# #     # raise
+# #     print("You entered incorrect age input: %s" % err)
+# # else:
+# #     print ("I see your age is: %s" % age)
+# # finally:
+# #     pass
+
+# import logging
+
+# logging.basicConfig(filename='myprogram.log', level=logging.ERROR)
+
+# logging.error("The washing machine is leaking!")
+# logging.critical("The house is on fire!")
+
+# logging.warning("We are almost out of milk.")
+# logging.info("It's sunny today.")
+# logging.debug("I had eggs for breakfast")
+
+# try:
+#     age = int(input("How old are you? "))
+# except Exception as e:
+#     # raise
+#     logging.exception(e)
+# else:
+#     pass
+# finally:
+#     pass
+
+from amity import Amity
+
+amity = Amity()
+amity.create_room("Living",["Mombasa"])
+# amity.create_room("office",["Mida"])
+# print (len(amity.all_rooms))
+# print (amity.all_rooms[0].rooms)
+# print (amity.all_rooms)
+
+print (amity.add_person("Arafat","Staff"))
+print (amity.add_person("Aisha","Fellow"))
+print (amity.add_person("Timina","Staff"))
+
+print (len(amity.all_persons))
+print (amity.all_persons[0].persons)
+print (amity.all_persons[1].persons)
+print("Found rooms")
+print(amity.get_random_room("Living"))
+amity.allocate_room(amity.all_persons[0].id)

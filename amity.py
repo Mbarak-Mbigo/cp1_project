@@ -4,21 +4,31 @@ This example uses docopt with the built in cmd module to demonstrate an
 interactive command application.
 
 Usage:
-    amity tcp <host> <port> [--timeout=<seconds>]
-    amity serial <port> [--baud=<n>] [--timeout=<seconds>]
+    amity create_room ( office | living ) <room_name>...
+    amity add_person < person_name > < FELLOW | STAFF > [ wants_accommodation ]
+    amity reallocate_person <person_identifier> <new_room_name>
+    amity load_people
+    amity print_allocations [-o=filename]
+    amity print_unallocated [-o=filename]
+    amity print_room <room_name>
+    amity save_state [--db=sqlite_database]
+    amity load_state <sqlite_database>
     amity (-i | --interactive)
     amity (-h | --help | --version)
-
 Options:
-    -i, --interactive  Interactive Mode
-    -h, --help  Show this screen and exit.
-    --baud=<n>  Baudrate [default: 9600]
+    -i --interactive   Interactive Mode.
+    -h --help          Show this screen and exit.
+    -v --version       Show application version
 """
 
 import sys
 import cmd
 from docopt import docopt, DocoptExit
 
+# local imports
+from app.amity import Amity
+
+docopt(__doc__, argv=None, help=True, version=0.1, options_first=False)
 
 def docopt_cmd(func):
     """
@@ -54,34 +64,86 @@ def docopt_cmd(func):
 class MyInteractive (cmd.Cmd):
     intro = 'Welcome to Amity!' \
         + ' (type help for a list of commands.)'
-    prompt = '(amity) '
+    prompt = 'Amity--> '
     file = None
+    amity = Amity()
 
     @docopt_cmd
-    def do_tcp(self, arg):
-        """Usage: tcp <host> <port> [--timeout=<seconds>]"""
+    def do_create_room(self, arg):
+        """Usage: create_room ( office | living ) <room_name>...
 
-        print(arg)
-
-    @docopt_cmd
-    def do_serial(self, arg):
-        """Usage: serial <port> [--baud=<n>] [--timeout=<seconds>]
-
-Options:
-    --baud=<n>  Baudrate [default: 9600]
         """
-
+        # self.amity.create_room(arg[0:], arg['<room_name>'])
         print(arg)
+
+    @docopt_cmd
+    def do_add_person(self, arg):
+        """Usage: add_person <person_name> <FELLOW|STAFF> [wants_accommodation]
+
+        """
+        print(arg)
+
+    @docopt_cmd
+    def do_reallocate_person(self, arg):
+        """Usage: reallocate_person <person_identifier> <new_room_name>
+
+        """
+        print(arg)
+
+    @docopt_cmd
+    def do_load_people(self):
+        """Usage: load_people
+
+        """
+        pass
+
+    @docopt_cmd
+    def do_print_allocations(self,arg):
+        """Usage: print_allocations [-o=filename]
+
+        """
+        print(arg)
+
+    def do_print_unallocated(self,arg):
+        """Usage: print_unallocated [-o=filename]
+
+        """
+        print(arg)
+
+    def do_print_room(self,arg):
+        """Usage: print_room <room_name>
+
+        """
+        print(arg)
+
+    def do_save_state(self,arg):
+        """Usage: save_state [--db=sqlite_database]
+
+        """
+        print(arg)
+
+    def do_load_state(self,arg):
+        """Usage: load_state <sqlite_database>
+
+        """
+        pass
 
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""
 
-        print('Good Bye!')
+        print('Quiting amity... \nApplication exited successfully')
+        exit()
+    def do_q(self, arg):
+        """Quits out of Interactive Mode."""
+
+        print('Quiting amity... \nApplication exited successfully')
         exit()
 
 opt = docopt(__doc__, sys.argv[1:])
 
+# print(opt)
+
 if opt['--interactive']:
     MyInteractive().cmdloop()
 
-print(opt)
+print(__doc__)

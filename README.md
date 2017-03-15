@@ -1,2 +1,2 @@
-# CP1A-Office-Space-Allocation
+# CP1A-office-Space-Allocation
 Project 1
