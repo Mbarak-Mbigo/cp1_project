@@ -10,8 +10,11 @@ class Person(object):
     def __init__(self, name, type):
         self.id = id(self)
         self.name = name
-        self.type=  type
+        self.type = type
         self.office_space=None
+
+    def __str__(self):
+        return "Person Id: " + str(self.id) + " Name: " + self.name + " Type: " + self.type 
 
 
 class Staff(Person):

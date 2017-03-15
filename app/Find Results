@@ -1,0 +1,299 @@
+Searching 25 files for "livingSpace"
+
+/Users/mbarakmbigo/facility/amity.py:
+    5  
+    6  Usage:
+    7:     amity create_room (office | livingSpace)<room_name>...
+    8      amity add_person <person_name> <FELLOW|STAFF> [wants_accommodation]
+    9      amity reallocate_person <person_identifier> <new_room_name>
+
+/Users/mbarakmbigo/facility/app/amity.py:
+   20           names after the create_room command.
+   21          Args:
+   22:             room_type: type of room (office|livingSpace).
+   23              rooms: A list of room names (any string)
+   24          Returns:
+   ..
+   27              TypeError: if rooms not a list.
+   28              ValueError: if rooms not strings
+   29:             ValueError: if room_type type not in (office| livingSpace).
+   30          """
+   31          try:
+   32:             if room_type not in ["office", "livingSpace"]:
+   33:                 raise ValueError("Invalid room type, it should be office or livingSpace")
+   34              elif not isinstance(rooms, list):
+   35                  raise TypeError("Provide a list of room name(s)")
+   ..
+   98                  # Scenario
+   99                  # room = self.get_random_room()
+  100:                 #  fellow: office|livingspace
+  101                  # staff: office
+  102                  self.allocate_room(person.id)
+  ...
+  119              ValueError: if person_id or new_room_name does not exist in System
+  120              NotImplementedError: if unallocated person is reallocated
+  121:                                  if staff being reallocated to livingspace
+  122                                   if person being reallocated from one type to another
+  123              SystemError: if no rooms available for rellocation
+  ...
+  131              current_room = next((room_name for room in self.all_rooms if room.room_id == person.office_space),None)
+  132              
+  133:             if person.type is "STAFF" and reallocate_room.type is "livingSpace":
+  134:                 raise NotImplementedError("Staff cannot be reallocated to livingspace")
+  135              elif person.office_space is "None" and reallocate_room.type is "office":
+  136                  raise ValueError("Allocate office space first before reallocating")
+  137:             elif person.type is "FELLOW" and reallocate_room.type is "livingSpace":
+  138                  if person.livingspace is None:
+  139:                     raise ValueError("Allocate livingSpace before reallocating")
+  140                  else:
+  141                      current_room = next((room for room in self.all_rooms if room.room_id == person.livingspace),None)
+  ...
+  151                  reallocate_room.occupants.append(person_id)
+  152                  person.office_space = reallocate_room.room_id
+  153:             elif reallocate_room.type is "livingSpace" and current_room is "livingSpace":
+  154                  current_room.occupants.remove(person_id)
+  155                  reallocate_room.occupants.append(person_id)
+  ...
+  210                  fellows 
+  211                  staff
+  212:             livingspace
+  213                  fellows
+  214  
+  ...
+  308  
+  309                  if person.type == "FELLOW" and accommodation == 'Y':
+  310:                     living_space = get_random_room("livingSpace")
+  311                      if living_space is not None:
+  312                          living_space.occupants.append(person.name)
+  ...
+  327          Rooms available
+  328              type: none
+  329:                 consider all categories (office/livingspace)
+  330              type: office
+  331                  consider office category
+  332:             type: livingSpace
+  333              type: other
+  334          """
+  335          try:
+  336:             if type not in ["office", "livingSpace"]:
+  337:                 raise ValueError("Room type can only be office or livingSpace")
+  338              elif not isinstance(current_room, str) and current_room is not None:
+  339                  raise ValueError("Room name must be a string")
+  ...
+  356      def search_rooms(self, first_search_term=None ,second_search_term=None):
+  357          """
+  358:         first_search-term = [None, office, livingSpace, other]
+  359:         second_search_term = [None, office, livingSpace, other]
+  360          search for room in Amity
+  361          Scenario:
+  362          type: None
+  363:             consider searching all categories (office and livingspace)
+  364:         type: office or livingSpace
+  365              search all rooms
+  366          type: other
+  ...
+  387          """
+  388          try:
+  389:             if  first_search_term not in [None, "office", "livingSpace"] and not isinstance(first_search_term, str)\
+  390:             or second_search_term not in [None, "office", "livingSpace"] and not isinstance(second_search_term, str):
+  391                  raise TypeError("Invalid Search Value(s)")
+  392              elif first_search_term == None and second_search_term == None:
+  ...
+  400              elif first_search_term == "office" and second_search_term== None:
+  401                  return [room for room in self.all_rooms if room.type == first_search_term]
+  402:             elif first_search_term == "livingSpace" and second_search_term== None:
+  403                  return [room for room in self.all_rooms if room.type == first_search_term]
+  404              elif isinstance(first_search_term, str) and second_search_term == None:
+  405                  return  [room for room in self.all_rooms if room.name == first_search_term]
+  406:             elif first_search_term in ["office", "livingSpace"] and isinstance(second_search_term, str):
+  407                  return [room for room in self.all_rooms if room.type == first_search_term and room.name == second_search_term]
+  408          
+
+/Users/mbarakmbigo/facility/app/amity_refactor.py:
+   16      def create_room(self,room_type, rooms=[]):
+   17          """"
+   18:         room type:String values: "office"| "livingSpace"
+   19          Scenarios: Input not in specified options
+   20              raise exception ValueError
+   ..
+   32          """
+   33          try:
+   34:             if room_type not in ["office", "livingSpace"]:
+   35:                 raise ValueError("Invalid room type, it should be office or livingSpace")
+   36              elif not isinstance(rooms, list):
+   37                  raise TypeError("Provide a list of room name")
+   ..
+   76              if Staff allocate office space
+   77              if Fellow and wants_accommodation is Yes
+   78:             allocate both office and livingspace
+   79              return person added
+   80              or Raise exception
+   ..
+  106                  # Scenario
+  107                  # room = self.get_random_room()
+  108:                 #  fellow: office|livingspace
+  109                  # staff: office
+  110                  self.allocate_room(person[0].id)
+  ...
+  123                  Person allocated
+  124                      Person Staff
+  125:                         reallocate livingspace
+  126                              raise exception (type???)
+  127                          reallocate office
+  ...
+  131                                  reallocate
+  132                      Person Fellow
+  133:                         Reallocate livingspace
+  134                              space not available
+  135                                  raise exception/ print error msg???
+  ...
+  152                          raise exception
+  153                      room not fully occupied
+  154:                         person staff room livingspace
+  155                              raise exception
+  156  
+  ...
+  210                  fellows 
+  211                  staff
+  212:             livingspace
+  213                  fellows
+  214  
+  ...
+  309          Rooms available
+  310              type: none
+  311:                 consider all categories (office/livingspace)
+  312              type: office
+  313                  consider office category
+  314:             type: livingSpace
+  315              type: other
+  316          """
+  317          try:
+  318:             if type not in ["office", "livingSpace"]:
+  319:                 raise ValueError("Room type can only be office or livingSpace")
+  320              elif not isinstance(current_room, str) and current_room is not None:
+  321                  raise ValueError("Room name must be a string")
+  ...
+  338      def search_rooms(self, first_search_term=None ,second_search_term=None):
+  339          """
+  340:         first_search-term = [None, office, livingSpace, other]
+  341:         second_search_term = [None, office, livingSpace, other]
+  342          search for room in Amity
+  343          Scenario:
+  344          type: None
+  345:             consider searching all categories (office and livingspace)
+  346:         type: office or livingSpace
+  347              search all rooms
+  348          type: other
+  ...
+  369          """
+  370          try:
+  371:             if  first_search_term not in [None, "office", "livingSpace"] and not isinstance(first_search_term, str)\
+  372:             or second_search_term not in [None, "office", "livingSpace"] and not isinstance(second_search_term, str):
+  373                  raise TypeError("Invalid Search Value(s)")
+  374              elif first_search_term == None and second_search_term == None:
+  ...
+  382              elif first_search_term == "office" and second_search_term== None:
+  383                  return [room for room in self.all_rooms if room.type == first_search_term]
+  384:             elif first_search_term == "livingSpace" and second_search_term== None:
+  385                  return [room for room in self.all_rooms if room.type == first_search_term]
+  386              elif isinstance(first_search_term, str) and second_search_term == None:
+  387                  return  [room for room in self.all_rooms if room.name == first_search_term]
+  388:             elif first_search_term in ["office", "livingSpace"] and isinstance(second_search_term, str):
+  389                  return [room for room in self.all_rooms if room.type == first_search_term and room.name == second_search_term]
+  390          
+  ...
+  473  
+  474  amity = Amity()
+  475: amity.create_room("livingSpace",["Mombasa"])
+  476  # amity.create_room("office",["Mida"])
+  477  # print (len(amity.all_rooms))
+  ...
+  487  print (amity.all_persons[1].persons)
+  488  print("Found rooms")
+  489: print(amity.get_random_room("livingSpace"))
+  490  amity.allocate_room(amity.all_persons[0].id)
+  491  
+
+/Users/mbarakmbigo/facility/app/room.py:
+   14          self.room_id = id(self)
+   15          self.name = name
+   16:         self.type =type         # only accept office or livingSpace
+   17          self.occupants = []
+   18  
+
+/Users/mbarakmbigo/facility/app/trial.py:
+    6  # add room
+    7  amity.create_room("office",['Mida'])
+    8: amity.create_room("livingSpace", ["Nania", "Mambrui"])
+    9  print("Total Rooms: %d" %len(amity.all_rooms))
+   10  
+
+/Users/mbarakmbigo/facility/tests/test_amity.py:
+   28          """"Test creates rooms of all types """
+   29          self.amity.create_room("office", ["Mida","Mirema", "Ruai"])
+   30:         self.amity.create_room("livingSpace", ["Swift", "Erlang"])
+   31          self.assertEqual(len(self.amity.all_rooms), 5, msg="Should create rooms")
+   32          self.assertTrue("Mida" in self.amity.search_rooms("office"))
+   33:         self.assertTrue("Swift" in self.amity.search_rooms("livingSpace"))
+   34          with self.assertRaises(ValueError) as error_info:
+   35              self.amity.create_room("Another", ["Specialroom"])
+   ..
+   39      
+   40      def test_allocating_living_space_to_staff_raises_permissionerror(self):
+   41:         """" Test trying to allocate a staff livingspaces
+   42              raises permission error error """
+   43          with self.assertRaises(PermissionError) as error_info:
+   44              self.amity.add_person("Maureen Nyakio", "Staff", "Y")
+   45:         self.assertTrue("Staffs are not allowed livingSpace allocation" in str(error_info.exception))
+   46      
+   47      #
+   ..
+   75          self.assertEqual(len(self.amity.all_rooms[1].occupants), 1, msg="Number of occupants should increase")
+   76  
+   77:         # fellow and livingspace reallocation
+   78:         self.amity.create_room("livingSpace", ["Swift", "Go"])
+   79          self.assertEqual(len(self.amity.all_rooms), 4, msg="Should add livingrooms")
+   80          self.amity.add_person("Oliver Tambo", "Fellow", "Y")
+   ..
+   85          self.assertEqual(len(self.amity.all_rooms[3].occupants), 0, "Number of occupants should decrease")
+   86          self.assertEqual(len(self.amity.all_rooms[4].occupants), 1, "Number of occupants should increase")
+   87:         # Test reallocating office to livingspace Raises an Exception
+   88:         # Test reallocating Staff to livingspace Raises an Exception
+   89          # Test reallocating a person not allocated yet raises an Error/Exception
+   90  
+
+60 matches across 6 files
+
+
+Searching 25 files for "living"
+
+/Users/mbarakmbigo/facility/app/amity.py:
+  137              elif person.type is "FELLOW" and reallocate_room.type is "Living":
+  138                  if person.livingspace is None:
+  139:                     raise ValueError("Allocate Living) before reallocating")
+  140                  else:
+  141                      current_room = next((room for room in self.all_rooms if room.room_id == person.livingspace),None)
+
+/Users/mbarakmbigo/facility/tests/test_amity.py:
+   43          with self.assertRaises(PermissionError) as error_info:
+   44              self.amity.add_person("Maureen Nyakio", "Staff", "Y")
+   45:         self.assertTrue("Staffs are not allowed livingallocation" in str(error_info.exception))
+   46      
+   47      #
+   ..
+   75          self.assertEqual(len(self.amity.all_rooms[1].occupants), 1, msg="Number of occupants should increase")
+   76  
+   77:         # fellow and livingreallocation
+   78          self.amity.create_room("Living", ["Swift", "Go"])
+   79:         self.assertEqual(len(self.amity.all_rooms), 4, msg="Should add livingrooms")
+   80          self.amity.add_person("Oliver Tambo", "Fellow", "Y")
+   81          self.assertEqual(len(self.amity.persons), 1, msg="Number of persons should increase")
+   ..
+   85          self.assertEqual(len(self.amity.all_rooms[3].occupants), 0, "Number of occupants should decrease")
+   86          self.assertEqual(len(self.amity.all_rooms[4].occupants), 1, "Number of occupants should increase")
+   87:         # Test reallocating office to livingRaises an Exception
+   88:         # Test reallocating Staff to livingRaises an Exception
+   89          # Test reallocating a person not allocated yet raises an Error/Exception
+   90  
+
+6 matches across 2 files
