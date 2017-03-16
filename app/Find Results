@@ -268,9 +268,9 @@ Searching 25 files for "livingSpace"
 Searching 25 files for "living"
 
 /Users/mbarakmbigo/facility/app/amity.py:
-  137              elif person.type is "FELLOW" and reallocate_room.type is "Living":
+  137              elif person.type is "FELLOW" and reallocate_room.type is "living":
   138                  if person.livingspace is None:
-  139:                     raise ValueError("Allocate Living) before reallocating")
+  139:                     raise ValueError("Allocate living) before reallocating")
   140                  else:
   141                      current_room = next((room for room in self.all_rooms if room.room_id == person.livingspace),None)
 
@@ -284,7 +284,7 @@ Searching 25 files for "living"
    75          self.assertEqual(len(self.amity.all_rooms[1].occupants), 1, msg="Number of occupants should increase")
    76  
    77:         # fellow and livingreallocation
-   78          self.amity.create_room("Living", ["Swift", "Go"])
+   78          self.amity.create_room("living", ["Swift", "Go"])
    79:         self.assertEqual(len(self.amity.all_rooms), 4, msg="Should add livingrooms")
    80          self.amity.add_person("Oliver Tambo", "Fellow", "Y")
    81          self.assertEqual(len(self.amity.persons), 1, msg="Number of persons should increase")

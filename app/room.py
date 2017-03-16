@@ -13,7 +13,7 @@ class Room(object):
     def __init__(self, name, type):
         self.room_id = id(self)
         self.name = name
-        self.type =type         # only accept office or Living
+        self.type =type         # only accept office or living
         self.occupants = []
 
     def __str__(self):
@@ -41,14 +41,14 @@ class office(Room):
     def __del__(self):
         office.rooms -= 1
 
-class LivingSpace(Room):
-    """docstring for LivingSpace"""
+class livingSpace(Room):
+    """docstring for livingSpace"""
     MAX_CAPACITY = 4
     rooms = 0
     def __init__(self, *args, **kwargs):
         self.occupants = []
-        LivingSpace.rooms += 1
-        super(LivingSpace, self).__init__(*args, **kwargs)
+        livingSpace.rooms += 1
+        super(livingSpace, self).__init__(*args, **kwargs)
 
     def is_fully_occupied(self):
         if len(self.occupants) < MAX_CAPACITY:
@@ -57,7 +57,7 @@ class LivingSpace(Room):
             return False
 
     def __del__(self):
-        LivingSpace.rooms -= 1
+        livingSpace.rooms -= 1
         
         
         
