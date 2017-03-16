@@ -230,7 +230,9 @@ class Amity(object):
             print("ALLOCATIONS")
             for room in occupied_rooms:
                 print("Room: %s" %room.name)
-                print(room.occupants)
+                print("--------------------------------")
+                print(", ".join(room.occupants))
+                print("\n")
         finally:
             pass
     
@@ -394,8 +396,8 @@ class Amity(object):
             pass
 
     def get_random_room(self, type, current_room=None):
-        """ 
-        Scenario: 
+        """
+        Scenario:
         No rooms
             raise exception
         Rooms available
