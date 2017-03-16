@@ -269,10 +269,24 @@ class Amity(object):
                 unallocated_office = [person for person in self.all_persons if person.office_space == None]
                 staff = [person for person in self.all_persons if person.type == "STAFF"]
                 unallocated_living = [person for person in self.all_persons if person.type == "FELLOW" and person.livingspace == None]
-                print("Office Space: ")
+                with open(outfile, 'w') as f:
+                    if len(unallocated_office) > 0:
+                        f.write("UNALLOCATED OFFICE SPACE \n")
+                        for person in unallocated_office:
+                            f.write(str(person))
+                            f.write('\n')
+                    if len(unallocated_living) > 0:
+                        f.write("UNALLOCATED LIVING SPACE \n")
+                        for person in unallocated_living:
+                            f.write(str(person))
+                            f.write('\n')
+
+                print("UNALLOCATED OFFICE SPACE")
+                print("-----------------------------------")
                 for person in unallocated_office:
                     print(person)
-                print("\nLiving Space:")
+                print("\nUNALLOCATED LIVING SPACE")
+                print("-----------------------------------")
                 for person in unallocated_living:
                     print(person)
         except Exception as e:
