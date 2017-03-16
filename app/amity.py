@@ -196,7 +196,6 @@ class Amity(object):
                         self.add_person(name, person_type, person_details[-1])
                     else:
                         self.add_person(name, person_type)
-                print(len(self.all_persons))
                 return "Loading operation successful"
         finally:
             pass
@@ -227,11 +226,12 @@ class Amity(object):
         except ValueError as e:
             return e
         else:
-            with open(outfile, "w") as f:
-                for room in occupied_rooms:
-                    f.write(room.name + '\n')
-                    f.write(", ".join(room.occupants))
-                    f.write('\n')
+            if outfile:
+                with open(outfile, "w") as f:
+                    for room in occupied_rooms:
+                        f.write(room.name + '\n')
+                        f.write(", ".join(room.occupants))
+                        f.write('\n')
             print("ALLOCATIONS")
             for room in occupied_rooms:
                 print("Room: %s" %room.name)
@@ -269,17 +269,18 @@ class Amity(object):
                 unallocated_office = [person for person in self.all_persons if person.office_space == None]
                 staff = [person for person in self.all_persons if person.type == "STAFF"]
                 unallocated_living = [person for person in self.all_persons if person.type == "FELLOW" and person.livingspace == None]
-                with open(outfile, 'w') as f:
-                    if len(unallocated_office) > 0:
-                        f.write("UNALLOCATED OFFICE SPACE \n")
-                        for person in unallocated_office:
-                            f.write(str(person))
-                            f.write('\n')
-                    if len(unallocated_living) > 0:
-                        f.write("UNALLOCATED LIVING SPACE \n")
-                        for person in unallocated_living:
-                            f.write(str(person))
-                            f.write('\n')
+                if outfile:
+                    with open(outfile, 'w') as f:
+                        if len(unallocated_office) > 0:
+                            f.write("UNALLOCATED OFFICE SPACE \n")
+                            for person in unallocated_office:
+                                f.write(str(person))
+                                f.write('\n')
+                        if len(unallocated_living) > 0:
+                            f.write("UNALLOCATED LIVING SPACE \n")
+                            for person in unallocated_living:
+                                f.write(str(person))
+                                f.write('\n')
 
                 print("UNALLOCATED OFFICE SPACE")
                 print("-----------------------------------")
@@ -400,7 +401,6 @@ class Amity(object):
                     person.office_space = office.room_id
 
                 if person.type == "FELLOW" and accommodation == 'Y':
-                    print("allocating living space")
                     living_space = self.get_random_room("living")
                     if living_space is not None:
                         living_space.occupants.append(person.name)
