@@ -388,18 +388,21 @@ class Amity(object):
         try:
             if type(person_id) is not int:
                 raise TypeError("Invalid person Id type")
+            if len(self.all_rooms) == 0:
+                return "No rooms to allocate"
         except TypeError as e:
             return e
         else:
             person = next((person for person in self.all_persons if person.id == person_id),None)
             if person is not None:
+                print("allocatting rooms...")
                 # allocate office space
                 office = self.get_random_room("office")
                 if office is not None:
                     print("allocating office space")
                     office.occupants.append(person.name)
                     person.office_space = office.room_id
-
+                # allocate living space
                 if person.type == "FELLOW" and accommodation == 'Y':
                     living_space = self.get_random_room("living")
                     if living_space is not None:
