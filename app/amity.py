@@ -128,7 +128,8 @@ class Amity(object):
             current_room = None
             person = next((person for person in self.all_persons if person.id == person_id),None)
             reallocate_room = next((room for room in self.all_rooms if room.name == new_room_name),None)
-            current_room = next((room_name for room in self.all_rooms if room.room_id == person.office_space),None)
+            current_room = next((room for room in self.all_rooms if room.room_id == person.office_space),None)
+            print(person.id)
             
             if person.type is "STAFF" and reallocate_room.type is "living":
                 raise NotImplementedError("Staff cannot be reallocated to living")
@@ -147,12 +148,12 @@ class Amity(object):
             return e
         else:
             if reallocate_room.type is "office" and current_room.type is "office":
-                current_room.occupants.remove(person.id)
-                reallocate_room.occupants.append(person_id)
+                current_room.occupants.remove(person.name)
+                reallocate_room.occupants.append(person.name)
                 person.office_space = reallocate_room.room_id
             elif reallocate_room.type is "living" and current_room is "living":
-                current_room.occupants.remove(person_id)
-                reallocate_room.occupants.append(person_id)
+                current_room.occupants.remove(person.name)
+                reallocate_room.occupants.append(person.name)
                 person.livingspace = reallocate_room.room_id
         finally:
             pass
