@@ -227,6 +227,11 @@ class Amity(object):
         except ValueError as e:
             return e
         else:
+            with open(outfile, "w") as f:
+                for room in occupied_rooms:
+                    f.write(room.name + '\n')
+                    f.write(", ".join(room.occupants))
+                    f.write('\n')
             print("ALLOCATIONS")
             for room in occupied_rooms:
                 print("Room: %s" %room.name)
