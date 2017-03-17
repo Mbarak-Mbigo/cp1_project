@@ -1,5 +1,9 @@
-# app/amity.py
-# TODO integrate app with docopt
+"""Amity main module.
+
+app/amity.py
+
+"""
+# imports
 from random import choice
 import os
 
@@ -9,10 +13,11 @@ from app.person import Staff, Fellow
 
 
 class Amity(object):
-    accommodation = None
-    all_rooms = []
-    all_persons = []
-        
+    """Docstring for Amity."""
+
+    rooms = {}
+    persons = {}
+
     def create_room(self, room_type, rooms):
         """Create room(s).
         create_room <room_name>... - Creates rooms in Amity.

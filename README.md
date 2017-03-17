@@ -1,2 +1,2 @@
-# CP1A-office-Space-Allocation
-Project 1
+# PROJECT AMITY
+Amity
