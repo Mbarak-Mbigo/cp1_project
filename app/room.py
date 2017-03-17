@@ -1,15 +1,18 @@
-# app/room.py
+"""room module.
+
+app/room.py
+
+"""
 
 # imports
 from abc import ABCMeta, abstractmethod
 
 
 class Room(object):
-    """docstring for Room
-        abstract class 
-    """
+    """docstring for Room abstract class."""
+
     __metaclass__ = ABCMeta
-    
+
     def __init__(self, name, type):
         self.room_id = id(self)
         self.name = name

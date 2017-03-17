@@ -1,12 +1,17 @@
-# app/Persons.py
+"""Person module.
+
+app/person.py
+
+"""
 
 from abc import ABCMeta, abstractmethod
 
 
 class Person(object):
-    
+    """Docstring for class Person."""
+
     __metaclass__ = ABCMeta
-    
+
     def __init__(self, name, type):
         self.id = id(self)
         self.name = name
