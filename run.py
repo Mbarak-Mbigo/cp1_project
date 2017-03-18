@@ -30,6 +30,7 @@ from app.amity import Amity
 
 docopt(__doc__, argv=None, help=True, version=0.1, options_first=False)
 
+
 def docopt_cmd(func):
     """
     This decorator is used to simplify the try/except block and pass the result
@@ -62,6 +63,8 @@ def docopt_cmd(func):
 
 
 class MyInteractive (cmd.Cmd):
+    """Program interface."""
+
     intro = 'Welcome to Amity!' \
         + ' (type help for a list of commands.)'
     prompt = 'Amity--> '
@@ -70,9 +73,7 @@ class MyInteractive (cmd.Cmd):
 
     @docopt_cmd
     def do_create_room(self, arg):
-        """Usage: create_room ( office | living ) <room_name>...
-
-        """
+        """Usage: create_room ( office | living ) <room_name>..."""
         # self.amity.create_room(arg[0:], arg['<room_name>'])
         print(arg)
 
