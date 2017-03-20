@@ -19,7 +19,7 @@ class Person(object):
     def __init__(self, name, type='FELLOW'):
         """Docstring for __init__."""
         self.id = id_gen()
-        self.name = name
+        self.name = name.upper()
         self.type = type
         self.office_space = None
 
@@ -44,15 +44,15 @@ class Staff(Person):
     def __init__(self, *args, **kwargs):
         """Docstring for Staff."""
         Staff.persons += 1
-        super(Staff, self).__init__(*args, **kwargs)
+        super(Staff, self).__init__(type='STAFF', *args, **kwargs)
 
     def __str__(self):
         """String representation."""
-        return "Id: " + self.id + " Name: " + self.name + " Type: " +\
+        return "Id: " + str(self.id) + " Name: " + self.name + " Type: " +\
             self.type
 
     def __del__(self):
-        """Docstring for del."""
+        """Update staff count on deleting."""
         Staff.persons -= 1
 
 
@@ -61,16 +61,16 @@ class Fellow(Person):
 
     persons = 0
 
-    def __init__(self, wants_accommodation, *args, **kwargs):
+    def __init__(self, name, wants_accommodation, *args, **kwargs):
         """Initialize instance variables."""
         self.accommodation = wants_accommodation
         self.living_space = None
         Fellow.persons += 1
-        super(Fellow, self).__init__(*args, **kwargs)
+        super(Fellow, self).__init__(name, type='FELLOW', *args, **kwargs)
 
     def __str__(self):
         """String representation."""
-        return "Id: " + self.id + " Name: " + self.name + " Type: " +\
+        return "Id: " + str(self.id) + " Name: " + self.name + " Type: " +\
             self.type + ' ' + self.accommodation
 
     def __del__(self):
