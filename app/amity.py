@@ -5,6 +5,7 @@ app/amity.py
 """
 # imports
 from random import choice
+import sqlite3 as lite
 import os
 
 # local imports
@@ -45,11 +46,10 @@ class Amity(object):
         try:
             # check room type within domain
             if room_type not in ["office", "living", "OFFICE", "LIVING"]:
-                raise ValueError("Invalid room type, should be office or\
-                 living")
+                raise ValueError("\nInvalid room type: {0}, should be office or living".format(room_type))
             # check room names given as a list
             elif not isinstance(rooms, list):
-                print(rooms)
+                return(rooms)
                 raise TypeError("Provide a list of room name(s)")
             # check room names are strings
             elif len(rooms) == 0 or not all(isinstance(x, str) for x in rooms):
@@ -159,7 +159,7 @@ class Amity(object):
                            person_id), None)
             # room to reallocate not found
             if not reallocate_room:
-                raise ValueError('No room {0} in the system'.format(new_room_name))
+                raise ValueError('{0} is not a room in the system'.format(new_room_name))
             # person not found
             if not person:
                 raise ValueError('No person with id {0}'.format(person_id))
@@ -266,7 +266,7 @@ class Amity(object):
                         f.write('\n')
             print("ALLOCATIONS")
             for room in (occupied_offices + occupied_living):
-                print("Room: {0}".format(room.name))
+                print("Room: {0} Type: {1}".format(room.name, room.type))
                 print("--------------------------------")
                 print(", ".join(room.occupants))
                 print("\n")
@@ -292,16 +292,15 @@ class Amity(object):
             output to file too.
         """
         try:
-            unallocated = None
-            if not any(self.persons):
+            if not any(dict(self.persons['staff'], **self.persons['fellows'])):
                 raise ValueError("No people in the system")
 
         except ValueError as e:
-            raise
+            return e
         else:
             all_persons = list(self.persons['staff'].values()) + list(self.persons['fellows'].values())
             unallocated_office = [p for p in all_persons if p.office_space == None]
-            unallocated_living = [l for l in list(self.rooms['livingspaces'].values()) if l.living_space is not None ]
+            unallocated_living = [l for l in all_persons if l.type == 'FELLOW' and l.living_space == None ]
             if outfile:
                 with open(outfile, 'w') as f:
                     if len(unallocated_office) > 0:
@@ -344,60 +343,95 @@ class Amity(object):
             return
         else:
             room = all_rooms[room_name]
+            print(room.name)
+            print('----------------------------------')
             print(room.occupants)
 
-    # def save_state(self, database="default-db"):
-    #     """"Persists all that in the application onto an
-    #         SQLite database"""
-    #     pass
+    def save_state(self, database='databases/default.db'):
+        """"Persist all that in the application onto an.
 
-    # def load_state(self, database=None):
-    #     """"Loads data from the provided database into the
-    #     application for use
-    #     Scenarios:
-    #     db provided does not exist
-    #         raise exception
-    #     db exists
-    #         no data
-    #             raise exception
-    #         data exists
-    #             unkown format
-    #                 raise exception
-    #             known format
-    #                 load data
-    #                     unsuccessful
-    #                         raise error
-    #                     successful
-    #                         load data
-    #     """
-    #     pass
+        SQLite database
+        """
+        pass
 
-    # #added functionality
-    # def print_available_space(self):
-    #     """
-    #     print all rooms and spaces available on each room (unallocated space)
-    #     args: None
-    #     Returns: un allocated space
-    #     Raise:
-    #         ValueError: if no room space available
+    def load_state(self, database='databases/default.db'):
+        """Load data from the provided database into the application."""
+        # check existence of database
+        try:
+            con = None
+            if self.dbexists(database):
+                print('All set to go with db')
+            else:
+                print('Oops! glitches exists!!!')
+                con = lite.connect(database)
+                cur = con.cursor()
+                cur.execute('SELECT SQLITE_VERSION()')
+                data = cur.fetchone()
+                print('SQlite version{0}'.format(data))
+        except lite.Error as e:
+            print('Error {0}'.format(e))
+        else:
+            with con:
+                print('database open and working')
+                cur = con.cursor() 
+                cur.execute("CREATE TABLE Cars(Id INT, Name TEXT, Price INT)")
+                cur.execute("INSERT INTO Cars VALUES(1,'Audi',52642)")
+                cur.execute("INSERT INTO Cars VALUES(2,'Mercedes',57127)")
+                cur.execute("INSERT INTO Cars VALUES(3,'Skoda',9000)")
+                cur.execute("INSERT INTO Cars VALUES(4,'Volvo',29000)")
+                cur.execute("INSERT INTO Cars VALUES(5,'Bentley',350000)")
+                cur.execute("INSERT INTO Cars VALUES(6,'Citroen',21000)")
+                cur.execute("INSERT INTO Cars VALUES(7,'Hummer',41400)")
+                cur.execute("INSERT INTO Cars VALUES(8,'Volkswagen',21600)")
 
-    #     """
-    #     try:
-    #         if len(self.all_rooms) == 0:
-    #             raise ValueError("No room space available")
+        finally:
+            if con:
+                con.close()
 
-    #     except ValueError as e:
-    #         return e
-    #     else:
-    #         office_space = [room for room in self.all_rooms if room.type == "office"]
-    #         living_space = [room for room in self.all_rooms if room.type == "living"]
-    #         print("AVAILABLE ROOMS:")
-    #         for room in office_space:
-    #            print(room)
-    #         for room in living_space:
-    #             print(room)
-    #     finally:
-    #         pass
+    def dbexists(self, database):
+        """Check if sqlite database exists."""
+        from os.path import isfile, getsize
+        if not isfile(database):
+            return False
+        # SQLite database file header is 100 bytes
+        if getsize(database) < 100:
+            return False
+        with open(database, 'rb') as db:
+            header = db.read(100)
+        return header[:16] == b'SQlite format 3\x00'
+
+
+    # added functionality
+
+    def print_available_space(self):
+        """Print all rooms and spaces available on each room.
+
+        args: None
+        Returns: un allocated space
+        Raise:
+            ValueError: if no room space available
+
+        """
+        try:
+            all_rooms = dict(self.rooms['offices'], **self.rooms['livingspaces'])
+            if not any(all_rooms):
+                raise ValueError("No room space available")
+
+        except ValueError as e:
+            print('\nStatus: {0}'.format(e))
+        else:
+            office_space = [o for o in list(self.rooms['offices'].values()) if len(o.occupants) < 6]
+            living_space = [l for l in list(self.rooms['livingspaces'].values()) if len(o.occupants) < 4]
+            print("AVAILABLE ROOMS:")
+            print('Office Space:')
+            print('----------------------------------')
+            for room in office_space:
+                print("Room: {0} Available space: {1}".format(room.name, 6 - len(room.occupants)))
+            print('\nLiving Space')
+            print('----------------------------------')
+            for room in living_space:
+                print("Room: {0} Available space: {1}".format(room.name, 4 - len(room.occupants)))
+
 
     # # Helper functions
 

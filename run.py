@@ -19,11 +19,15 @@ Options:
     -i --interactive   Interactive Mode.
     -h --help          Show this screen and exit.
     -v --version       Show application version
+    --wants_accommodation=<ac> accommodation for fellows [default:'N']
+
 """
 # imports
 import sys
 import cmd
 from docopt import docopt, DocoptExit
+from pyfiglet import figlet_format
+from termcolor import cprint
 
 # local imports
 from app.amity import Amity
@@ -65,75 +69,91 @@ def docopt_cmd(func):
 class MyInteractive (cmd.Cmd):
     """Program interface."""
 
-    intro = 'Welcome to Amity!' \
-        + ' (type help for a list of commands.)'
-    prompt = 'Amity--> '
+    intro = cprint(figlet_format('Amity', font='isometric3'), 'blue')
+    prompt = 'Amity-->>> '
     file = None
     amity = Amity()
 
     @docopt_cmd
     def do_create_room(self, arg):
-        """Usage: create_room ( office | living ) <room_name>..."""
-        # self.amity.create_room(arg[0:], arg['<room_name>'])
-        print(arg)
+        """Usage: create_room <type> <rooms>..."""
+        print(self.amity.create_room(arg['<rooms>'], arg['<type>']))
 
     @docopt_cmd
     def do_add_person(self, arg):
-        """Usage: add_person <person_name> <FELLOW|STAFF> [wants_accommodation]
+        """Usage: add_person <first_name> <last_name> <type> [--wants-accommodation='N']
 
         """
-        print(arg)
+        name = arg['<first_name>'] + ' ' + arg['<last_name>']
+        if not arg['--wants-accommodation']:
+            print(self.amity.add_person(name, arg['<type>'], 'N'))
+        else:
+            print(self.amity.add_person(name, arg['<type>'], arg['--wants-accommodation']))
 
     @docopt_cmd
     def do_reallocate_person(self, arg):
         """Usage: reallocate_person <person_identifier> <new_room_name>
 
         """
-        print(arg)
+        print(self.amity.reallocate_person(arg['<person_identifier>'], arg['<new_room_name>']))
 
     @docopt_cmd
-    def do_load_people(self):
-        """Usage: load_people
+    def do_load_people(self, arg):
+        """Usage: load_people FILE
 
         """
-        pass
+        print(self.amity.load_people(arg['FILE']))
 
     @docopt_cmd
-    def do_print_allocations(self,arg):
-        """Usage: print_allocations [-o=filename]
+    def do_print_allocations(self, arg):
+        """Usage: print_allocations [-o <filename>]
 
         """
-        print(arg)
+        if not arg['-o']:
+            print(self.amity.print_allocations())
+        else:
+            print(self.amity.print_allocations(arg['<filename>']))
 
-    def do_print_unallocated(self,arg):
-        """Usage: print_unallocated [-o=filename]
+    @docopt_cmd
+    def do_print_unallocated(self, arg):
+        """Usage: print_unallocated [-o <filename>]
 
         """
-        print(arg)
+        if not arg['-o']:
+            print(self.amity.print_unallocated())
+        else:
+            print(self.amity.print_unallocated(arg['<filename>']))
 
-    def do_print_room(self,arg):
+    @docopt_cmd
+    def do_print_room(self, arg):
         """Usage: print_room <room_name>
 
         """
-        print(arg)
+        print(self.amity.print_room(arg['<room_name>']))
 
-    def do_save_state(self,arg):
+    @docopt_cmd
+    def do_save_state(self, arg):
         """Usage: save_state [--db=sqlite_database]
 
         """
-        print(arg)
+        if not arg['--db']:
+            print(self.amity.save_state())
+        else:
+            print(self.amity.save_state(arg['--db']))
 
-    def do_load_state(self,arg):
+    @docopt_cmd
+    def do_load_state(self, arg):
         """Usage: load_state <sqlite_database>
 
         """
-        pass
+        print(self.amity.load_state(arg['<sqlite_database>']))
 
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""
 
         print('Quiting amity... \nApplication exited successfully')
         exit()
+
     def do_q(self, arg):
         """Quits out of Interactive Mode."""
 
