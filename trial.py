@@ -5,15 +5,18 @@ trial.py
 # imports
 from app.amity import Amity
 
+from app.room import Room, Office, Living
+from app.person import Person, Fellow, Staff
 
-# amity = Amity()
-# amity.create_room("office", ['Mida', 'Krypton','Tsavo', 'Hogwarts', 'Valhalla'])
-# amity.create_room("living", ['Go', 'PHP', 'Swift'])
-# amity.create_room('office', ['Bugatti', 'Range'])
-# amity.add_person('Rayyah Timamy', 'STAFF')
-# amity.print_unallocated()
-# amity.print_allocations()
 
-# amity.reallocate_person(amity.all_persons[0].id, "Bugatti")
-# amity.print_unallocated()
-# amity.print_allocations()
+amity = Amity()
+# create offices
+# amity.create_room(['Mida', 'Swift', 'Latifa'], 'office')
+# amity.create_room(['myOffice'])
+# # create staff
+# amity.add_person('Mbarak Mbigo', 'STAFF')
+
+# amity.load_people()
+# amity.print_unallocated('data/unallocated.txt')
+# amity.print_available_space()
+amity.load_state('databases/default.db')
