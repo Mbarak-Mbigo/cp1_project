@@ -7,10 +7,12 @@ app/amity.py
 from random import choice
 import sqlite3 as lite
 import os
+from termcolor import cprint
 
 # local imports
 from app.room import Office, Living
 from app.person import Staff, Fellow
+from app import db
 
 
 class Amity(object):
@@ -249,11 +251,9 @@ class Amity(object):
                 raise ValueError("No rooms available")
             else:
                 occupied_offices = [o for o in list(self.rooms['offices'].values()) if len(o.occupants) > 0]
-                if len(occupied_offices) == 0:
-                    print("There are no office allocations")
-                occupied_living = [l for l in list(self.rooms['livingspaces'].values()) if len(o.occupants) > 0]
-                if len(occupied_living) == 0:
-                    print("There are no living space allocations")
+                occupied_living = [l for l in list(self.rooms['livingspaces'].values()) if len(l.occupants) > 0]
+                if len(occupied_offices) == 0 and  len(occupied_living) == 0:
+                    return("\nThere are no allocations\n")
 
         except ValueError as e:
             return e
@@ -269,7 +269,7 @@ class Amity(object):
                 print("Room: {0} Type: {1}".format(room.name, room.type))
                 print("--------------------------------")
                 print(", ".join(room.occupants))
-                print("\n")
+                print("\n\n")
 
     def print_unallocated(self, outfile=None):
         """"
@@ -300,7 +300,7 @@ class Amity(object):
         else:
             all_persons = list(self.persons['staff'].values()) + list(self.persons['fellows'].values())
             unallocated_office = [p for p in all_persons if p.office_space == None]
-            unallocated_living = [l for l in all_persons if l.type == 'FELLOW' and l.living_space == None ]
+            unallocated_living = [l for l in all_persons if l.type == 'FELLOW' and l.accommodation =='Y' and l.living_space == None ]
             if outfile:
                 with open(outfile, 'w') as f:
                     if len(unallocated_office) > 0:
@@ -314,7 +314,7 @@ class Amity(object):
                             f.write(str(person))
                             f.write('\n')
 
-            print("UNALLOCATED OFFICE SPACE")
+            print("\nUNALLOCATED OFFICE SPACE")
             print("-----------------------------------")
             for person in unallocated_office:
                 print(person)
@@ -322,6 +322,7 @@ class Amity(object):
             print("-----------------------------------")
             for person in unallocated_living:
                 print(person)
+            return 'Operation successful.'
 
     def print_room(self, room_name):
         """"Given a room name, print all the people allocated to that room.
@@ -346,59 +347,73 @@ class Amity(object):
             print(room.name)
             print('----------------------------------')
             print(room.occupants)
+            print('\n\n')
 
     def save_state(self, database='databases/default.db'):
-        """"Persist all that in the application onto an.
+        """"Persist all data in a db.
 
-        SQLite database
+        if db name is new, 
+            create db,
+                structure using a schema,
+                populate with app data
+        db already exists:
+            update data:
+                could delete  and recreate
+                or fetch and update
+        return status
         """
-        pass
+        try:
+            conn = None
+            # database does not exist
+            if not os.path.exists(database):
+                lite.connect(database)
+                conn = db.create_connection(database)
+                print('{0} Created successfully'.format(database))
+
+        except Exception as e:
+            raise
+        else:
+            if conn:
+                with conn:
+                    db.load_schema(database)
+                    print('save state')
+                    print('return msg')
+        finally:
+            if conn:
+                conn.close()
 
     def load_state(self, database='databases/default.db'):
         """Load data from the provided database into the application."""
         # check existence of database
+        """
+        if does not exist 
+            return err msg
+
+        if exists,
+            check if has valid data
+                no?
+                    return msg
+                else:
+                    load data from db to app
+
+        """
+        # db does not exist
         try:
-            con = None
-            if self.dbexists(database):
-                print('All set to go with db')
-            else:
-                print('Oops! glitches exists!!!')
-                con = lite.connect(database)
-                cur = con.cursor()
-                cur.execute('SELECT SQLITE_VERSION()')
-                data = cur.fetchone()
-                print('SQlite version{0}'.format(data))
-        except lite.Error as e:
-            print('Error {0}'.format(e))
+            # check db existence
+            conn = db.create_connection(database)
+            if conn:
+                with conn:
+                    print('Database exists and connection established')
+
+
+
+        except Exception as e:
+            raise e
         else:
-            with con:
-                print('database open and working')
-                cur = con.cursor() 
-                cur.execute("CREATE TABLE Cars(Id INT, Name TEXT, Price INT)")
-                cur.execute("INSERT INTO Cars VALUES(1,'Audi',52642)")
-                cur.execute("INSERT INTO Cars VALUES(2,'Mercedes',57127)")
-                cur.execute("INSERT INTO Cars VALUES(3,'Skoda',9000)")
-                cur.execute("INSERT INTO Cars VALUES(4,'Volvo',29000)")
-                cur.execute("INSERT INTO Cars VALUES(5,'Bentley',350000)")
-                cur.execute("INSERT INTO Cars VALUES(6,'Citroen',21000)")
-                cur.execute("INSERT INTO Cars VALUES(7,'Hummer',41400)")
-                cur.execute("INSERT INTO Cars VALUES(8,'Volkswagen',21600)")
-
+            pass
         finally:
-            if con:
-                con.close()
-
-    def dbexists(self, database):
-        """Check if sqlite database exists."""
-        from os.path import isfile, getsize
-        if not isfile(database):
-            return False
-        # SQLite database file header is 100 bytes
-        if getsize(database) < 100:
-            return False
-        with open(database, 'rb') as db:
-            header = db.read(100)
-        return header[:16] == b'SQlite format 3\x00'
+            pass
+  
 
 
     # added functionality
@@ -422,15 +437,17 @@ class Amity(object):
         else:
             office_space = [o for o in list(self.rooms['offices'].values()) if len(o.occupants) < 6]
             living_space = [l for l in list(self.rooms['livingspaces'].values()) if len(o.occupants) < 4]
-            print("AVAILABLE ROOMS:")
+            print("\nAVAILABLE ROOMS:")
+            print('Room:' + "   " + 'Space')
             print('Office Space:')
-            print('----------------------------------')
+            print('------------------------')
             for room in office_space:
-                print("Room: {0} Available space: {1}".format(room.name, 6 - len(room.occupants)))
-            print('\nLiving Space')
-            print('----------------------------------')
+                print({0} {1}.format(room.name, 6 - len(room.occupants)))
+            print('\n\nLiving Space')
+            print('------------------------')
             for room in living_space:
-                print("Room: {0} Available space: {1}".format(room.name, 4 - len(room.occupants)))
+                print({0} {1}.format(room.name, 4 - len(room.occupants)))
+            print('\n')
 
 
     # # Helper functions
