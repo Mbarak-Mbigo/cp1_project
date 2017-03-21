@@ -50,7 +50,7 @@ class Office(Room):
 
     def __str__(self):
         """String representation."""
-        return "Id: " + str(self.id) + " Name: " + self.name + " Type: " +\
+        return str(self.id) + ' ' + self.name + ' ' +\
             self.type
 
     def __del__(self):
@@ -81,7 +81,7 @@ class Living(Room):
 
     def __str__(self):
         """String representation."""
-        return "Id: " + str(self.id) + " Name: " + self.name + " Type: " +\
+        return str(self.id) + ' ' + self.name + ' ' +\
             self.type
 
     def __del__(self):

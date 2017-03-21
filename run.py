@@ -7,9 +7,10 @@ Usage:
     amity create_room ( office | living ) <room_name>...
     amity add_person < person_name > < FELLOW | STAFF > [ wants_accommodation ]
     amity reallocate_person <person_identifier> <new_room_name>
-    amity load_people
+    amity load_people FILE
     amity print_allocations [-o=filename]
     amity print_unallocated [-o=filename]
+    print_available_space
     amity print_room <room_name>
     amity save_state [--db=sqlite_database]
     amity load_state <sqlite_database>
@@ -70,6 +71,8 @@ class MyInteractive (cmd.Cmd):
     """Program interface."""
 
     intro = cprint(figlet_format('Amity', font='isometric3'), 'blue')
+    print('\ntype help for a list of commands.\n')
+
     prompt = 'Amity-->>> '
     file = None
     amity = Amity()
@@ -106,23 +109,28 @@ class MyInteractive (cmd.Cmd):
 
     @docopt_cmd
     def do_print_allocations(self, arg):
-        """Usage: print_allocations [-o <filename>]
+        """Usage: print_allocations [--o=filename]
 
         """
-        if not arg['-o']:
+        if not arg['--o']:
             print(self.amity.print_allocations())
         else:
-            print(self.amity.print_allocations(arg['<filename>']))
+            print(self.amity.print_allocations(arg['--o']))
 
     @docopt_cmd
     def do_print_unallocated(self, arg):
-        """Usage: print_unallocated [-o <filename>]
+        """Usage: print_unallocated [--o=filename]
 
         """
-        if not arg['-o']:
+        if not arg['--o']:
             print(self.amity.print_unallocated())
         else:
-            print(self.amity.print_unallocated(arg['<filename>']))
+            print(self.amity.print_unallocated(arg['--o']))
+
+    @docopt_cmd
+    def do_print_available_space(self,arg):
+        """Usage: print_available_space"""
+        print(self.amity.print_available_space())
 
     @docopt_cmd
     def do_print_room(self, arg):

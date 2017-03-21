@@ -25,8 +25,8 @@ class Person(object):
 
     def __str__(self):
         """Docstring for str."""
-        return "Id: " + str(self.id) + " Name: " + \
-            self.name + " Type: " + self.type
+        return str(self.id) + ' ' + \
+            self.name + ' ' + self.type
 
     def allocated_office(self):
         """Return true if allocated."""
@@ -48,7 +48,7 @@ class Staff(Person):
 
     def __str__(self):
         """String representation."""
-        return "Id: " + str(self.id) + " Name: " + self.name + " Type: " +\
+        return str(self.id) + ' ' + self.name + ' ' +\
             self.type
 
     def __del__(self):
@@ -70,7 +70,7 @@ class Fellow(Person):
 
     def __str__(self):
         """String representation."""
-        return "Id: " + str(self.id) + " Name: " + self.name + " Type: " +\
+        return str(self.id) + ' ' + self.name + ' ' +\
             self.type + ' ' + self.accommodation
 
     def __del__(self):
