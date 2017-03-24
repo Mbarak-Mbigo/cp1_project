@@ -7,7 +7,7 @@ Usage:
     amity create_room ( office | living ) <room_name>...
     amity add_person < person_name > < FELLOW | STAFF > [ wants_accommodation ]
     amity reallocate_person <person_identifier> <new_room_name>
-    amity load_people FILE
+    amity load_people <file>
     amity print_allocations [-o=filename]
     amity print_unallocated [-o=filename]
     print_available_space
@@ -76,6 +76,8 @@ class MyInteractive (cmd.Cmd):
     prompt = 'Amity-->>> '
     file = None
     amity = Amity()
+    # load previous state
+    amity.load_state()
 
     @docopt_cmd
     def do_create_room(self, arg):
@@ -94,6 +96,11 @@ class MyInteractive (cmd.Cmd):
             print(self.amity.add_person(name, arg['<type>'], arg['--wants-accommodation']))
 
     @docopt_cmd
+    def do_allocate(self, arg):
+        """allocate unallocated."""
+        pass
+
+    @docopt_cmd
     def do_reallocate_person(self, arg):
         """Usage: reallocate_person <person_identifier> <new_room_name>
 
@@ -102,10 +109,10 @@ class MyInteractive (cmd.Cmd):
 
     @docopt_cmd
     def do_load_people(self, arg):
-        """Usage: load_people FILE
+        """Usage: load_people <file>
 
         """
-        print(self.amity.load_people(arg['FILE']))
+        print(self.amity.load_people(arg['<file>']))
 
     @docopt_cmd
     def do_print_allocations(self, arg):
