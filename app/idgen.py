@@ -3,7 +3,7 @@ from random import choice
 import uuid
 
 
-def id_gen():
+def id_generator():
     """Generate custom 4 digit unique IDs."""
     raw_uuid = uuid.uuid4()
     code = ''
@@ -13,6 +13,6 @@ def id_gen():
     for i in range(4):
         code += choice(datalist)
     if int(code) < 999:
-        return id_gen()
+        return id_generator()
     else:
         return int(code)

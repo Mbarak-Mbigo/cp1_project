@@ -8,24 +8,51 @@ app/room.py
 from abc import ABCMeta, abstractmethod
 
 # local imports
-from app.idgen import id_gen
+from app.idgen import id_generator
 
 
 class Room(metaclass=ABCMeta):
     """Docstring for Room."""
 
-    def __init__(self, name, type='OFFICE'):
+    def __init__(self, name, idcode=None, occupants=None):
         """Initializing instance variables."""
-        super(Room, self).__init__()
-        self.id = id_gen()
-        self.name = name.title()
-        self.type = type.upper()
-        self.occupants = []
+        self.name = name.upper()
+        self.id = idcode
+        self.occupants = occupants
+
+    # room id
+    @property
+    def id(self):
+        return self._id
+
+    @id.setter
+    def id(self, code):
+        if code:
+            self._id = code
+        else:
+            self._id = id_generator()
+
+    # room occupants
+    @property
+    def occupants(self,):
+        return self._occupants
+
+    @occupants.setter
+    def occupants(self, occupants_list):
+        if occupants_list:
+            self._occupants = []
+            self._occupants.extend(occupants_list)
+        else:
+            self._occupants = []
 
     @abstractmethod
     def is_full(self):
         """Return True if room fully occupied."""
         pass
+
+    def __repr__(self):
+        return 'Room(id:{0} name:{1} occupants:{2}'.format(
+            self.id, self.name, self.occupants)
 
 
 class Office(Room):
@@ -33,13 +60,12 @@ class Office(Room):
 
     # cls variables
     MAX_CAPACITY = 6
-    rooms = 0
 
     def __init__(self, *args, **kwargs):
         """Initialize office instance varialbles."""
-        self.occupants = []
-        Office.rooms += 1
-        super(Office, self).__init__(type='OFFICE', *args, **kwargs)
+        self.type_ = 'OFFICE'
+        super(Office, self).__init__(*args, **kwargs)
+
 
     def is_full(self):
         """Overide base implementation."""
@@ -50,12 +76,8 @@ class Office(Room):
 
     def __str__(self):
         """String representation."""
-        return str(self.id) + ' ' + self.name + ' ' +\
-            self.type
-
-    def __del__(self):
-        """Update number of rooms after deleting."""
-        Office.rooms -= 1
+        return str(Room.id) + ' ' + self.name + ' ' +\
+            self.type_
 
 
 class Living(Room):
@@ -63,14 +85,11 @@ class Living(Room):
 
     # cls variables
     MAX_CAPACITY = 4
-    rooms = 0
 
     def __init__(self, *args, **kwargs):
         """Initialize instance variables."""
-        Room.type = 'LIVING'
-        self.occupants = []
-        Living.rooms += 1
-        super(Living, self).__init__(type='LIVING', *args, **kwargs)
+        self.type_ = 'LIVING'
+        super(Living, self).__init__(*args, **kwargs)
 
     def is_full(self):
         """Overiding base implementation."""
@@ -82,8 +101,4 @@ class Living(Room):
     def __str__(self):
         """String representation."""
         return str(self.id) + ' ' + self.name + ' ' +\
-            self.type
-
-    def __del__(self):
-        """Update living rooms after deleting."""
-        Living.rooms -= 1
+            self.type_
