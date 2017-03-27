@@ -23,6 +23,7 @@ class Person(metaclass=ABCMeta):
 
     @property
     def id(self):
+        """Id property."""
         return self._id
 
     @id.setter
@@ -54,8 +55,10 @@ class Staff(Person):
         super(Staff, self).__init__(*args, **kwargs)
 
     def __repr__(self):
-        return '{0} (id:{1} name:{2} office:{3})'.format(self.role, self.id, self.name, self.office_space)
-
+        """Object representation format for Staff."""
+        return '{0} (id:{1} name:{2} office:{3})'.format(self.role, self.id,
+                                                         self.name,
+                                                         self.office_space)
 
     def __str__(self):
         """String representation."""
@@ -74,7 +77,11 @@ class Fellow(Person):
         super(Fellow, self).__init__(name, idcode, office_space)
 
     def __repr__(self):
-        return '{0} (id:{1} name:{2} office:{3} living:{4} accommodation:{5}'.format(self.role, self.id, self.name, self.office_space, self.living_space, self.accommodation)
+        """Defining object representation."""
+        return '{0} (id:{1} name:{2} office:{3} living:{4}\
+        accommodation:{5}'.format(self.role, self.id, self.name,
+                                  self.office_space, self.living_space,
+                                  self.accommodation)
 
     def __str__(self):
         """String representation."""
