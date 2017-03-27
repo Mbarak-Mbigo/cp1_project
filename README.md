@@ -20,7 +20,7 @@ You can type help to check available commands.
 For the usage of each available command, type the command without any arguments
 for example $ creat_room
 to quit the application
-type: ***$ quit*** or ***$ q***
+type: ```$ quit``` or ***$ q***
 That's it!
 ## Contribution
 Mbarak Mbigo
