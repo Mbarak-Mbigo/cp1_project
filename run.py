@@ -82,7 +82,7 @@ class MyInteractive (cmd.Cmd):
     @docopt_cmd
     def do_create_room(self, arg):
         """Usage: create_room <type> <rooms>..."""
-        print(self.amity.create_room(arg['<rooms>'], arg['<type>']))
+        self.amity.create_room(arg['<rooms>'], arg['<type>'])
 
     @docopt_cmd
     def do_add_person(self, arg):
@@ -91,28 +91,36 @@ class MyInteractive (cmd.Cmd):
         """
         name = arg['<first_name>'] + ' ' + arg['<last_name>']
         if not arg['--wants-accommodation']:
-            print(self.amity.add_person(name, arg['<type>'], 'N'))
+            self.amity.add_person(name, arg['<type>'], 'N')
         else:
-            print(self.amity.add_person(name, arg['<type>'], arg['--wants-accommodation']))
+            self.amity.add_person(name, arg['<type>'], arg['--wants-accommodation'])
 
     @docopt_cmd
     def do_allocate(self, arg):
-        """allocate unallocated."""
-        pass
+        """Usage: allocate [--f=<firstname> --l=<lastname>]"""
+        if arg['--f'] and arg['--l']:
+            name = ' '.join([arg['--f'], arg['--l']])
+            self.amity.allocate_room(name)
+        else:
+            if arg['--f'] or arg['--l']:
+                cprint('If you are specifying a name, kindly provide'
+                       '--f=<firstnam> and --l=lastname', 'red')
+            else:
+                self.amity.allocate_room()
 
     @docopt_cmd
     def do_reallocate_person(self, arg):
         """Usage: reallocate_person <person_identifier> <new_room_name>
 
         """
-        print(self.amity.reallocate_person(arg['<person_identifier>'], arg['<new_room_name>']))
+        self.amity.reallocate_person(arg['<person_identifier>'], arg['<new_room_name>'])
 
     @docopt_cmd
     def do_load_people(self, arg):
         """Usage: load_people <file>
 
         """
-        print(self.amity.load_people(arg['<file>']))
+        self.amity.load_people(arg['<file>'])
 
     @docopt_cmd
     def do_print_allocations(self, arg):
@@ -120,9 +128,9 @@ class MyInteractive (cmd.Cmd):
 
         """
         if not arg['--o']:
-            print(self.amity.print_allocations())
+            self.amity.print_allocations()
         else:
-            print(self.amity.print_allocations(arg['--o']))
+            self.amity.print_allocations(arg['--o'])
 
     @docopt_cmd
     def do_print_unallocated(self, arg):
@@ -130,21 +138,21 @@ class MyInteractive (cmd.Cmd):
 
         """
         if not arg['--o']:
-            print(self.amity.print_unallocated())
+            self.amity.print_unallocated()
         else:
-            print(self.amity.print_unallocated(arg['--o']))
+            self.amity.print_unallocated(arg['--o'])
 
     @docopt_cmd
-    def do_print_available_space(self,arg):
+    def do_print_available_space(self, arg):
         """Usage: print_available_space"""
-        print(self.amity.print_available_space())
+        self.amity.print_available_space()
 
     @docopt_cmd
     def do_print_room(self, arg):
         """Usage: print_room <room_name>
 
         """
-        print(self.amity.print_room(arg['<room_name>']))
+        self.amity.print_room(arg['<room_name>'])
 
     @docopt_cmd
     def do_save_state(self, arg):
@@ -152,27 +160,30 @@ class MyInteractive (cmd.Cmd):
 
         """
         if not arg['--db']:
-            print(self.amity.save_state())
+            self.amity.save_state()
         else:
-            print(self.amity.save_state(arg['--db']))
+            self.amity.save_state(arg['--db'])
 
     @docopt_cmd
     def do_load_state(self, arg):
-        """Usage: load_state <sqlite_database>
+        """Usage: load_state [--db=sqlite_database]
 
         """
-        print(self.amity.load_state(arg['<sqlite_database>']))
+        if not arg['--db']:
+            self.amity.load_state()
+        else:
+            self.amity.load_state(arg['--db'])
 
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""
 
-        print('Quiting amity... \nApplication exited successfully')
+        cprint('Quiting amity... \nApplication exited successfully', 'white')
         exit()
 
     def do_q(self, arg):
         """Quits out of Interactive Mode."""
 
-        print('Quiting amity... \nApplication exited successfully')
+        cprint('Quiting amity... \nApplication exited successfully', 'white')
         exit()
 
 opt = docopt(__doc__, sys.argv[1:])
