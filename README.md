@@ -31,7 +31,7 @@ A beautiful interface will appear.
 You can type help to check available commands.
 For the usage of each available command, type the command without any arguments
 
-for example ```$ create_room`
+for example `$ create_room`
 to quit the application
 
  `$ quit` or `$ q`
