@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/Mbarak-Mbigo/cp1_project/badge.svg?branch=develop)](https://coveralls.io/github/Mbarak-Mbigo/cp1_project?branch=develop)
+
 # PROJECT: AMITY
 Amity is a commandline application developed in python.
 It's an application that can be used to manage living room and office spaces allocation 
@@ -28,5 +30,3 @@ That's it!
 Mbarak Mbigo
 
 ## Credits
-
-[![Coverage Status](https://coveralls.io/repos/github/Mbarak-Mbigo/cp1_project/badge.svg?branch=develop)](https://coveralls.io/github/Mbarak-Mbigo/cp1_project?branch=develop)
