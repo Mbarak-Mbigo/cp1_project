@@ -44,10 +44,11 @@ class AmityTests(unittest.TestCase):
         self.assertTrue(334 not in self.amity.rooms['offices'].keys())
         # Can create one room
         self.amity.create_room(['Narnia'], 'OFFICE')
-        self.assertTrue('Narnia' in self.amity.rooms['offices'].keys())
+        self.assertTrue('NARNIA' in self.amity.rooms['offices'].keys())
         # Does not allow to create room(s) already existing
-        err_msg = self.amity.create_room(['Narnia'], 'OFFICE')
-        self.assertTrue('Narnia already exists' in err_msg)
+        self.amity.create_room(['Narnia'], 'OFFICE')
+        self.assertTrue('Narnia already exists' in
+                        str(self.amity.create_room(['Narnia'], 'OFFICE')))
         # Can create many rooms
         num_of_rooms = (len(self.amity.rooms['livingspaces'].keys()))
         self.amity.create_room(['Tsavo', 'Zimmer'], 'LIVING')
@@ -64,14 +65,14 @@ class AmityTests(unittest.TestCase):
             Person('Ramadhan Salim')
         # test adds succesfully
         self.amity.add_person('Jackson Nania', 'FELLOW')
-        self.assertTrue('Jackson Nania' in self.amity.persons['fellows'].keys())
+        self.assertTrue('JACKSON NANIA' in self.amity.persons['fellows'].keys())
         self.amity.add_person('Rehema Tanya', 'STAFF')
-        self.assertTrue('Rehema Tanya' in self.amity.persons['staff'].keys())
+        self.assertTrue('REHEMA TANYA' in self.amity.persons['staff'].keys())
 
         # Test rejects duplicate
         count_before = len(self.amity.persons['fellows'].keys())
-        self.assertTrue('already exists' in
-                        str(self.amity.add_person('Jackson Nania', 'FELLOW')))
+        err_msg = self.amity.add_person('Jackson Nania', 'FELLOW')
+        self.assertTrue('Person: Jackson Nania already exists' in repr(err_msg))
         count_after = len(self.amity.persons['fellows'].keys())
 
         self.assertEqual(count_after, count_before,
@@ -79,12 +80,12 @@ class AmityTests(unittest.TestCase):
         # test allocates when room available
         self.amity.create_room(['Narnia'], 'OFFICE')
         self.amity.add_person('Simam', 'FELLOW')
-        self.assertTrue(self.amity.persons['fellows']['Simam'].office_space ==
-                        'Narnia', msg='Should allocate space')
+        self.assertTrue(self.amity.persons['fellows']['SIMAM'].office_space ==
+                        'NARNIA', msg='Should allocate space')
         self.amity.create_room(['Mida'], 'LIVING')
         self.amity.add_person('Achach', 'FELLOW', 'Y')
-        self.assertTrue('Mida' in
-                        self.amity.persons['fellows']['Achach'].living_space)
+        self.assertTrue('MIDA' in
+                        self.amity.persons['fellows']['ACHACH'].living_space)
 
         # test rejects staff accommodation
         count_before = len(self.amity.persons['staff'])
@@ -99,8 +100,10 @@ class AmityTests(unittest.TestCase):
         self.amity.create_room(['Chanda'], 'OFFICE')
         self.amity.add_person('Ann', 'FELLOW')
         self.amity.create_room(['Mida'], 'OFFICE')
-        self.amity.reallocate_person(self.amity.persons['fellows']['Ann'].id,
-                                     'Mida')
+        self.amity.reallocate_person(self.amity.persons['fellows']['ANN'].id,
+                                     'MIDA')
+        self.assertTrue(self.amity.persons['fellows']['ANN'].office_space ==
+                        'MIDA')
 
     """DB tests.
         createdb

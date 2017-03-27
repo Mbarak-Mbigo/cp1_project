@@ -45,6 +45,15 @@ def load_schema(db, db_schema='databases/amity_default.sql'):
             cur.executescript(schema)
 
 
+def load(rooms, persons, cur):
+    """Load state to application."""
+    load_office(rooms['offices'], cur)
+    load_living(rooms['livingspaces'], cur)
+    load_staff(persons['staff'], cur)
+    load_fellow(persons['fellows'], cur)
+    return 'Operation complete...'
+
+
 def save_office(dictoffice, cur):
     """Save office rooms data into database table offices."""
     # check for data existence
