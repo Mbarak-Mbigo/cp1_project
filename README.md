@@ -28,3 +28,5 @@ That's it!
 Mbarak Mbigo
 
 ## Credits
+
+[![Coverage Status](https://coveralls.io/repos/github/Mbarak-Mbigo/cp1_project/badge.svg?branch=develop)](https://coveralls.io/github/Mbarak-Mbigo/cp1_project?branch=develop)
