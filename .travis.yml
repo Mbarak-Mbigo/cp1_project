@@ -3,8 +3,11 @@ python:
   - "3.6"
 # command to install dependencies
 install: "pip install -r requirements.txt"
+
+# sudo mode normal
+sudo: false
+
 # command to run tests
 
-sudo: false
 script: 
   - nosetests --with-coverage --cover-package=app/
