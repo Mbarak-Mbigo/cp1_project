@@ -76,7 +76,8 @@ class Amity(object):
         status = []
         if room_type.upper() == "OFFICE":
             for room in rooms:
-                if room.upper() not in self.rooms['offices'].keys() and room.upper() not in self.rooms['livingspaces'].keys():
+                if room.upper() not in self.rooms['offices'].keys() and\
+                        room.upper() not in self.rooms['livingspaces'].keys():
                     self.rooms['offices'][room.upper()] = Office(room.upper())
                 else:
                     status.append(room)
@@ -84,11 +85,13 @@ class Amity(object):
                 return cprint('Room(s) ' + ', '.join(rooms) +
                               ' Created successfully', 'green')
             else:
-                return cprint('Room(s) ' + ', '.join(status) +
-                              ' already exists', 'red')
+                cprint('Room(s) ' + ', '.join(status) + ' already exists',
+                       'red')
+                return 'Room(s) ' + ', '.join(status) + ' already exists'
         else:
             for room in rooms:
-                if room.upper() not in self.rooms['livingspaces'].keys() and room.upper() not in self.rooms['offices'].keys():
+                if room.upper() not in self.rooms['livingspaces'].keys() and\
+                        room.upper() not in self.rooms['offices'].keys():
                     self.rooms['livingspaces'][room.upper()] =\
                         Living(room.upper())
                 else:
@@ -97,8 +100,9 @@ class Amity(object):
                 return cprint('Room(s) ' + ', '.join(rooms) +
                               ' Created successfully', 'green')
             else:
-                return cprint('Room(s) ' + ', '.join(status) +
-                              ' already exists', 'red')
+                cprint('Room(s) ' + ', '.join(status) + ' already exists',
+                       'red')
+                return 'Room(s) ' + ', '.join(status) + ' already exists'
 
     def add_person(self, name, role='FELLOW', accommodation='N'):
         u"""Create a person, add to system, allocate to random room.
@@ -128,16 +132,16 @@ class Amity(object):
             # person already exists
             elif name.upper() in self.persons['staff'].keys() or\
                     name.upper() in self.persons['fellows'].keys():
-                raise ValueError(cprint(
-                    'Person: {0} already exists'.format(name), 'red'))
+                cprint('Person: {0} already exists'.format(name), 'red')
+                raise ValueError('Person: {0} already exists'.format(name))
             # Role not in domain
             elif role not in ['staff', 'fellow', 'STAFF', 'FELLOW']:
-                raise ValueError(cprint(
-                    'Person role can either be STAFF or FELLOW', 'red'))
+                cprint('Person role can either be STAFF or FELLOW', 'red')
+                raise ValueError('Person role can either be STAFF or FELLOW')
             # accommodation not within specified domain
             elif accommodation not in ['y', 'Y', 'n', 'N']:
-                raise ValueError(cprint(
-                    "Accommodation can either be 'Y' or 'N' "), 'red')
+                cprint("Accommodation can either be 'Y' or 'N' ", 'red')
+                raise ValueError("Accommodation can either be 'Y' or 'N' ")
 
         except (ValueError, PermissionError) as e:
             return e
@@ -151,9 +155,11 @@ class Amity(object):
                     name.upper(), None, None, accommodation)
                 cprint('Fellow: {0} added successfully.'.format(name), 'green')
             if role.upper() == 'STAFF' and accommodation == 'Y':
-                cprint('Staff cannot be allocated living space', 'red')
+                cprint('Staff cannot request for accommodation', 'red')
+                return 'Staff cannot request for accommodation'
             # allocate person
-            return self.allocate_room(name)
+            else:
+                return self.allocate_room(name)
 
     def allocate_room(self, name=None):
         """Allocate room to person."""
@@ -166,19 +172,24 @@ class Amity(object):
                     person = all_pple[name.upper()]
                     unallocated.append(person)
                 else:
-                    unallocated = [person for person in list(all_pple.values()) if not person.office_space]
-                    unallocated.extend([person for person in list(self.persons['fellows'].values()) if not person.living_space and person.accommodation == 'Y'])
+                    unallocated = [person for person in list(
+                        all_pple.values()) if not person.office_space]
+                    unallocated.extend([person for person in list(
+                        self.persons['fellows'].values()) if not
+                        person.living_space and person.accommodation == 'Y'])
             # person does not exist
             if not unallocated:
                 if name and not person:
-                    raise ValueError(cprint('Person: {0} does not exist'
-                                            .format(name), 'red'))
+                    cprint('Person: {0} does not exist'.format(name), 'red')
+                    raise ValueError('Person: {0} does not exist'.format(name))
                 else:
-                    raise ValueError(cprint('No person to allocate', 'red'))
+                    cprint('No person to allocate', 'red')
+                    raise ValueError('No person to allocate')
         except ValueError as e:
             return e
         except KeyError as e:
             cprint('Person: {0} does not exist'.format(name), 'red')
+            return e
         else:
             # person exists
             for person in unallocated:
@@ -188,6 +199,8 @@ class Amity(object):
                     cprint('Staff: {0} already allocated office space,'
                            'did you want to reallocate?'.format(person.name),
                            'red')
+                    return 'Staff: {0} already allocated office space,'\
+                        'did you want to reallocate?'.format(person.name)
                 else:
                     if person.role == 'FELLOW' and not person.office_space and not\
                             person.living_space:
@@ -199,6 +212,8 @@ class Amity(object):
                     else:
                         cprint('Fellow:{0} already allocated, did you want to'
                                'realloate?'.format(person.name))
+                        return 'Fellow:{0} already allocated, did you want to'\
+                               'realloate?'.format(person.name)
 
 
     def allocate_office(self, person):
@@ -289,8 +304,8 @@ class Amity(object):
                 current_office.occupants.remove(person.name)
                 reallocate_room.occupants.append(person.name)
                 person.office_space = reallocate_room.name
-                return cprint("Reallocation of office space successful.",
-                              'green')
+                print('my reallocated office space: {0}'.format(person.office_space))
+                cprint("Reallocation of office space successful.", 'green')
 
     def reallocate_living_space(self, person, reallocate_room):
         """Reallocate living space."""

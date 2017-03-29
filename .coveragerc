@@ -1,0 +1,30 @@
+# .coveragerc to control coverage.py
+[run]
+branch = True
+
+source = 
+  app/
+include =
+  app/amity.py
+  app/db.py
+  app/room.py
+  app/person.py
+
+omit = 
+  virtualenvs/*
+  tabulate.py                    
+  termcolor.py                    
+  ctypes.py                      
+  ctypes/_endian.py             
+  ctypes/macholib.py             
+  ctypes/macholib/dyld.py         
+  ctypes/macholib/dylib.py       
+  ctypes/macholib/framework.py     
+  ctypes/util.py                 
+  sqlite3.py                     
+  sqlite3/dbapi2.py                
+  unittest/mock.py                
+  uuid.py
+
+[html]
+directory = coverage_html_report
