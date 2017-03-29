@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Mbarak-Mbigo/cp1_project.svg?branch=master)](https://travis-ci.org/Mbarak-Mbigo/cp1_project)[![Code Climate](https://codeclimate.com/github/Mbarak-Mbigo/cp1_project/badges/gpa.svg)](https://codeclimate.com/github/Mbarak-Mbigo/cp1_project)
+[![Build Status](https://travis-ci.org/Mbarak-Mbigo/cp1_project.svg?branch=master)](https://travis-ci.org/Mbarak-Mbigo/cp1_project) [![Code Climate](https://codeclimate.com/github/Mbarak-Mbigo/cp1_project/badges/gpa.svg)](https://codeclimate.com/github/Mbarak-Mbigo/cp1_project)
 
 
 # PROJECT: AMITY
