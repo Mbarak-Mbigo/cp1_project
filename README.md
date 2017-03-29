@@ -1,6 +1,5 @@
-[![Coverage Status](https://coveralls.io/repos/github/Mbarak-Mbigo/cp1_project/badge.svg?branch=develop)](https://coveralls.io/github/Mbarak-Mbigo/cp1_project?branch=develop)
+[![Build Status](https://travis-ci.org/Mbarak-Mbigo/cp1_project.svg?branch=master)](https://travis-ci.org/Mbarak-Mbigo/cp1_project)[![Code Climate](https://codeclimate.com/github/Mbarak-Mbigo/cp1_project/badges/gpa.svg)](https://codeclimate.com/github/Mbarak-Mbigo/cp1_project)
 
-[![Code Climate](https://codeclimate.com/github/Mbarak-Mbigo/cp1_project/badges/gpa.svg)](https://codeclimate.com/github/Mbarak-Mbigo/cp1_project)
 
 # PROJECT: AMITY
 Amity is a commandline application developed in python.
