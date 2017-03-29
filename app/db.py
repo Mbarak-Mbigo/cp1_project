@@ -67,9 +67,11 @@ def save_office(dictoffice, cur):
                 cur.execute('''DELETE FROM offices''')
             # save current records
             for obj in list(dictoffice.values()):
-                cur.execute("""INSERT INTO offices(id, name, type, occupants, MAX_CAPACITY)
+                cur.execute("""INSERT INTO offices(id, name, type, occupants,
+                            MAX_CAPACITY)
                                 VALUES(?, ?, ?, ?, ?)""",
-                            (obj.id, obj.name, obj.type_, str(obj.occupants), obj.MAX_CAPACITY))
+                            (obj.id, obj.name, obj.type_, str(obj.occupants),
+                             obj.MAX_CAPACITY))
 
     except Error as e:
         print('Error: {0}'.format(e))
@@ -79,10 +81,12 @@ def load_office(dictoffice, cur):
     """Load office rooms data to application."""
     try:
         # check table exists
-        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="offices"')
+        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
+                    'name="offices"')
         table = cur.fetchone()[0]
         if table == 0:
-            raise AttributeError('Database does not have table:{0}!'.format('offices'))
+            raise AttributeError('Database does not have table:{0}!'
+                                 .format('offices'))
         # check table has data
 
     except AttributeError as e:
@@ -95,7 +99,8 @@ def load_office(dictoffice, cur):
             cur.execute('''SELECT * FROM offices''')
             records = cur.fetchall()
             for record in records:
-                dictoffice[record[1]] = Office(record[1], record[0], literal_eval(record[3]))
+                dictoffice[record[1]] = Office(record[1], record[0],
+                                               literal_eval(record[3]))
 
 
 def save_living(dictliving, cur):
@@ -111,21 +116,26 @@ def save_living(dictliving, cur):
                 cur.execute('''DELETE FROM livingspaces''')
             # save current records
             for obj in list(dictliving.values()):
-                cur.execute("""INSERT INTO livingspaces(id, name, type, occupants, MAX_CAPACITY)
+                cur.execute("""INSERT INTO livingspaces(id, name, type,
+                            occupants, MAX_CAPACITY)
                             VALUES(?, ?, ?, ?, ?)""",
-                            (obj.id, obj.name, obj.type_, str(obj.occupants), obj.MAX_CAPACITY))
+                            (obj.id, obj.name, obj.type_, str(obj.occupants),
+                             obj.MAX_CAPACITY))
 
     except Error as e:
         print('Error: {0}'.format(e))
+
 
 def load_living(dictliving, cur):
     """Load living rooms to application."""
     try:
         # check table exists
-        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="livingspaces"')
+        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
+                    'name="livingspaces"')
         table = cur.fetchone()[0]
         if table == 0:
-            raise AttributeError('Database does not have table:{0}!'.format('livingspaces'))
+            raise AttributeError('Database does not have table:{0}!'
+                                 .format('livingspaces'))
 
     except AttributeError as e:
         return e
@@ -137,7 +147,9 @@ def load_living(dictliving, cur):
             cur.execute('''SELECT * FROM livingspaces''')
             records = cur.fetchall()
             for record in records:
-                dictliving[record[1]] = Living(record[1], record[0], literal_eval(record[3]))
+                dictliving[record[1]] = Living(record[1], record[0],
+                                               literal_eval(record[3]))
+
 
 def save_staff(dictstaff, cur):
     """Save staff persons data into database."""
@@ -158,14 +170,17 @@ def save_staff(dictstaff, cur):
     except Error as e:
         print('Error: {0}'.format(e))
 
+
 def load_staff(dictstaff, cur):
     """Load staff to application."""
     try:
         # check table exists
-        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="staff"')
+        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
+                    'name="staff"')
         table = cur.fetchone()[0]
         if table == 0:
-            raise AttributeError('Database does not have table:{0}!'.format('staff'))
+            raise AttributeError('Database does not have table:{0}!'
+                                 .format('staff'))
 
     except AttributeError as e:
         return e
@@ -193,21 +208,26 @@ def save_fellow(dictfellow, cur):
                 cur.execute('''DELETE FROM fellows''')
             # save current records
             for obj in list(dictfellow.values()):
-                cur.execute("""INSERT INTO fellows(id, name, type, office_space, living_space, accommodation)
+                cur.execute("""INSERT INTO fellows(id, name, type,
+                            office_space, living_space, accommodation)
                             VALUES(?, ?, ?, ?, ?, ?)""",
-                            (obj.id, obj.name, obj.role, obj.office_space, obj.living_space, obj.accommodation))
+                            (obj.id, obj.name, obj.role, obj.office_space,
+                             obj.living_space, obj.accommodation))
 
     except Exception as e:
         print('Error: {0}'.format(e))
+
 
 def load_fellow(dictfellow, cur):
     """Load staff to application."""
     try:
         # check table exists
-        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="fellows"')
+        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
+                    'name="fellows"')
         table = cur.fetchone()[0]
         if table == 0:
-            raise AttributeError('Database does not have table:{0}!'.format('fellows'))
+            raise AttributeError('Database does not have table:{0}!'
+                                 .format('fellows'))
 
     except AttributeError as e:
         return e
@@ -219,4 +239,5 @@ def load_fellow(dictfellow, cur):
             cur.execute('''SELECT * FROM fellows''')
             records = cur.fetchall()
             for record in records:
-                dictfellow[record[1]] = Fellow(record[1], record[0], record[3], record[5], record[4])
+                dictfellow[record[1]] = Fellow(record[1], record[0], record[3],
+                                               record[5], record[4])
