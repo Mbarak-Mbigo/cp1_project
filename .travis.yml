@@ -10,3 +10,6 @@ sudo: false
 # command to run tests
 script: 
   - nosetests --with-coverage --cover-erase
+
+after_success:
+  - codeclimate-test-reporter
