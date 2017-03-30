@@ -61,7 +61,7 @@ class Amity(object):
                     "Provide a list of room name(s)", 'red'))
             # check room names are strings
             elif len(rooms) == 0 or not all(isinstance(
-                    x, str) for x in rooms):
+                    room, str) for room in rooms):
                 raise ValueError(
                     cprint("Invalid room name, only strings accepted"), 'red')
 
@@ -81,10 +81,11 @@ class Amity(object):
                     self.rooms['offices'][room.upper()] = Office(room.upper())
                 else:
                     status.append(room)
-            if len(status) == 0:
+            if not status:
                 return cprint('Room(s) ' + ', '.join(rooms) +
                               ' Created successfully', 'green')
             else:
+
                 cprint('Room(s) ' + ', '.join(status) + ' already exists',
                        'red')
                 return 'Room(s) ' + ', '.join(status) + ' already exists'
@@ -96,7 +97,7 @@ class Amity(object):
                         Living(room.upper())
                 else:
                     status.append(room)
-            if len(status) == 0:
+            if not status:
                 return cprint('Room(s) ' + ', '.join(rooms) +
                               ' Created successfully', 'green')
             else:
@@ -202,8 +203,8 @@ class Amity(object):
                     return 'Staff: {0} already allocated office space,'\
                         'did you want to reallocate?'.format(person.name)
                 else:
-                    if person.role == 'FELLOW' and not person.office_space and not\
-                            person.living_space:
+                    if person.role == 'FELLOW' and not person.office_space and\
+                            not person.living_space:
                         self.allocate_office(person)
                         if person.accommodation == 'Y':
                             self.allocate_living_space(person)
@@ -214,7 +215,6 @@ class Amity(object):
                                'realloate?'.format(person.name))
                         return 'Fellow:{0} already allocated, did you want to'\
                                'realloate?'.format(person.name)
-
 
     def allocate_office(self, person):
         """Allocate office space.
@@ -621,15 +621,18 @@ class Amity(object):
             # db exists
             conn = db.create_connection(dbpath)
             if conn:
-                all_pple = dict(self.persons['staff'], **self.persons['fellows'])
-                all_rooms = dict(self.rooms['offices'], **self.rooms['livingspaces'])
+                all_pple = dict(self.persons['staff'],
+                                **self.persons['fellows'])
+                all_rooms = dict(self.rooms['offices'],
+                                 **self.rooms['livingspaces'])
                 if any(all_pple) or any(all_rooms):
                     cprint('Current applicaton data will be overwriten!\n',
                            'red')
                     choice = input('Enter:"y" to continue, "n" to Cancel ')
                     while choice not in ['n', 'N', 'y', 'Y']:
                         cprint('Invalid choice:{0}'.format(choice), 'red')
-                        choice = input('Enter:"y" to continue, "n" to Cancel: ')
+                        choice = input('Enter:"y" to continue,'
+                                       '"n" to Cancel: ')
                     else:
                         if choice in ['y', 'Y']:
                             print('updating... \n')

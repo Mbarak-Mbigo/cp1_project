@@ -66,7 +66,6 @@ class Office(Room):
         self.type_ = 'OFFICE'
         super(Office, self).__init__(*args, **kwargs)
 
-
     def is_full(self):
         """Overide base implementation."""
         if len(self.occupants) < Office.MAX_CAPACITY:

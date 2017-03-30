@@ -86,14 +86,16 @@ class MyInteractive (cmd.Cmd):
 
     @docopt_cmd
     def do_add_person(self, arg):
-        """Usage: add_person <first_name> <last_name> <type> [--wants-accommodation='N']
+        """Usage: add_person <first_name> <last_name> <type>
+        [--wants-accommodation='N']
 
         """
         name = arg['<first_name>'] + ' ' + arg['<last_name>']
         if not arg['--wants-accommodation']:
             self.amity.add_person(name, arg['<type>'], 'N')
         else:
-            self.amity.add_person(name, arg['<type>'], arg['--wants-accommodation'])
+            self.amity.add_person(name, arg['<type>'],
+                                  arg['--wants-accommodation'])
 
     @docopt_cmd
     def do_allocate(self, arg):
@@ -113,7 +115,8 @@ class MyInteractive (cmd.Cmd):
         """Usage: reallocate_person <person_identifier> <new_room_name>
 
         """
-        self.amity.reallocate_person(arg['<person_identifier>'], arg['<new_room_name>'])
+        self.amity.reallocate_person(arg['<person_identifier>'],
+                                     arg['<new_room_name>'])
 
     @docopt_cmd
     def do_load_people(self, arg):
