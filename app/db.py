@@ -54,6 +54,11 @@ def load(rooms, persons, cur):
     return 'Operation complete...'
 
 
+def save_to_db(rooms, persons, cur):
+    """Save state to database."""
+    save_office(dictoffice, cur)
+
+
 def save_office(dictoffice, cur):
     """Save office rooms data into database table offices."""
     # check for data existence
