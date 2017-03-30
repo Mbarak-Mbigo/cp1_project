@@ -31,43 +31,7 @@ class Amity(object):
         'fellows': {}
     }
 
-    @staticmethod
-    def check_is_office(room):
-        """Check if a room is of type office.
-
-        param: room
-        Return true if room type is office
-        """
-        return room.type_ in ['office', 'Office', 'OFFICE']
-
-    @staticmethod
-    def check_is_living(room):
-        """Check if a room is of type living space.
-
-        param: room
-        Return true if room type is living
-        """
-        return room.type_ in ['living', 'Living', 'LIVING']
-
-    @staticmethod
-    def check_is_fellow(person):
-        """Check if a person is of role fellow.
-
-        param: person
-        Return true if person role is fellow
-        """
-        return person.role in ['fellow', 'Fellow', 'FELLOW']
-
-    @staticmethod
-    def check_is_staff(person):
-        """Check if a person is of role staff.
-
-        param: person
-        Return true if person role is staff
-        """
-        return person.role in ['staff', 'Staff', 'STAFF']
-
-    def create_room(self, rooms, room_type='OFFICE'):
+    def create_room(self, rooms, type_='OFFICE'):
         """Create rooms in Amity.
 
         Args:
@@ -76,74 +40,71 @@ class Amity(object):
         Returns:
             Room(s) created.
         Raises:
-            TypeError: if rooms not a list.
             ValueError: if rooms not strings
             ValueError: if room_type type not in (office| living).
         """
         try:
             # check room type within domain
-            if room_type not in ["office", "living", "OFFICE", "LIVING"]:
-                raise ValueError(cprint("\nInvalid room type:"
-                                        "{0}, should be office or living\n"
-                                        .format(room_type), 'red'))
-            # check room names given as a list
-            elif not isinstance(rooms, list):
-                return(rooms)
-                raise TypeError(cprint(
-                    "Provide a list of room name(s)", 'red'))
-            # check room names are strings
-            elif len(rooms) == 0 or not all(isinstance(
-                    room, str) for room in rooms):
-                raise ValueError(
-                    cprint("Invalid room name, only strings accepted"), 'red')
+            if type_ not in ["office", "living", "OFFICE", "LIVING"]:
+                cprint('Invalid type: {0}, should be office or living.'
+                       .format(type_), 'red')
+                raise ValueError('Invalid room type: {0}'.format(type_))
+
+            if not all(isinstance(room, str) for room in rooms):
+                cprint('Room names can only be strings', 'red')
+                raise TypeError('Invalid room name type')
 
         except (ValueError, TypeError) as e:
             return e
+
         else:
+            return self._add_room(rooms, type_)
 
-            return self.add_room(rooms, room_type)
-
-    def add_office(self, room):
-        """Add office rooms to system."""
-        pass
-
-    def add_living(self, room):
-        """Add living rooms to system."""
-        pass
-
-    def add_room(self, rooms, room_type):
+    def _add_room(self, rooms, room_type):
         """Create and add room(s) to Amity."""
-        status = []
         if room_type.upper() == "OFFICE":
-            for room in rooms:
-                if room.upper() not in self.rooms['offices'].keys() and\
-                        room.upper() not in self.rooms['livingspaces'].keys():
-                    self.rooms['offices'][room.upper()] = Office(room.upper())
-                else:
-                    status.append(room)
-            if not status:
-                return cprint('Room(s) ' + ', '.join(rooms) +
-                              ' Created successfully', 'green')
-            else:
-
-                cprint('Room(s) ' + ', '.join(status) + ' already exists',
-                       'red')
-                return 'Room(s) ' + ', '.join(status) + ' already exists'
+            exists = self._add_office(rooms)
         else:
-            for room in rooms:
-                if room.upper() not in self.rooms['livingspaces'].keys() and\
-                        room.upper() not in self.rooms['offices'].keys():
-                    self.rooms['livingspaces'][room.upper()] =\
-                        Living(room.upper())
-                else:
-                    status.append(room)
-            if not status:
-                return cprint('Room(s) ' + ', '.join(rooms) +
-                              ' Created successfully', 'green')
+            exists = self._add_living(rooms)
+
+        if not exists:
+            cprint('Room(s) ' + ', '.join(rooms) + ' Created successfully',
+                   'green')
+            return 'Success'
+        else:
+            cprint('Rooms Created:{0}'
+                   .format([room for room in rooms if room not in exists]),
+                   'white')
+            cprint('Room(s) ' + ', '.join(exists) + ' already exists', 'red')
+            return "Can't recreate existing rooms"
+
+    def _add_office(self, rooms):
+        """Add office rooms to system."""
+        exists = []
+        for room in rooms:
+            if self._room_exists(room):
+                exists.append(room)
             else:
-                cprint('Room(s) ' + ', '.join(status) + ' already exists',
-                       'red')
-                return 'Room(s) ' + ', '.join(status) + ' already exists'
+                self.rooms['offices'][room.upper()] = Office(room.upper())
+        return exists
+
+    def _add_living(self, rooms):
+        """Add living rooms to system."""
+        exists = []
+        for room in rooms:
+            if self._room_exists(room):
+                exists.append(room)
+            else:
+                self.rooms['livingspaces'][room.upper()] = Living(room.upper())
+        return exists
+
+    def _room_exists(self, room):
+        """Return true if room exists."""
+        all_rooms = dict(self.rooms['offices'], **self.rooms['livingspaces'])
+        if room.upper() in all_rooms.keys():
+            return True
+        else:
+            return False
 
     def add_person(self, name, role='FELLOW', accommodation='N'):
         u"""Create a person, add to system, allocate to random room.
