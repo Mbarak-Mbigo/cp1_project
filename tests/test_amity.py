@@ -46,7 +46,6 @@ class AmityTests(unittest.TestCase):
         self.amity.create_room(['Narnia'], 'OFFICE')
         self.assertTrue('NARNIA' in self.amity.rooms['offices'].keys())
         # Does not allow to create room(s) already existing
-        
         self.amity.create_room(['Narnia'], 'OFFICE')
         self.assertEqual('Room(s) Narnia already exists',
                          self.amity.create_room(['Narnia'], 'OFFICE'))
@@ -85,11 +84,10 @@ class AmityTests(unittest.TestCase):
         # test allocates when room available
         self.amity.create_room(['Narnia'], 'OFFICE')
         self.amity.add_person('Simam', 'FELLOW')
-        self.assertTrue(self.amity.persons['fellows']['Simam'].office_space ==
-                        'Narnia', msg='Should allocate space')
+        self.assertTrue(self.amity.persons['fellows']['SIMAM'].office_space ==
+                        'NARNIA', msg='Should allocate space')
         self.amity.create_room(['Mida'], 'LIVING')
         self.amity.add_person('Achach', 'FELLOW', 'Y')
-<<
         self.assertTrue('MIDA' in
                         self.amity.persons['fellows']['ACHACH'].living_space)
         # test rejects staff accommodation
