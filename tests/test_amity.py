@@ -13,7 +13,7 @@ import unittest.mock
 
 # local imports
 from app.amity import Amity
-from app.room import Room, Office, Living
+from app.room import Room
 from app.person import Person
 
 

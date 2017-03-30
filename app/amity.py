@@ -31,15 +31,47 @@ class Amity(object):
         'fellows': {}
     }
 
-    def create_room(self, rooms, room_type='OFFICE'):
-        """Create room(s).
+    @staticmethod
+    def check_is_office(room):
+        """Check if a room is of type office.
 
-        create_room <room_name>... - Creates rooms in Amity.
-        Using this command I should be able to create as
-        many rooms as possible by specifying multiple room
-         names after the create_room command.
+        param: room
+        Return true if room type is office
+        """
+        return room.type_ in ['office', 'Office', 'OFFICE']
+
+    @staticmethod
+    def check_is_living(room):
+        """Check if a room is of type living space.
+
+        param: room
+        Return true if room type is living
+        """
+        return room.type_ in ['living', 'Living', 'LIVING']
+
+    @staticmethod
+    def check_is_fellow(person):
+        """Check if a person is of role fellow.
+
+        param: person
+        Return true if person role is fellow
+        """
+        return person.role in ['fellow', 'Fellow', 'FELLOW']
+
+    @staticmethod
+    def check_is_staff(person):
+        """Check if a person is of role staff.
+
+        param: person
+        Return true if person role is staff
+        """
+        return person.role in ['staff', 'Staff', 'STAFF']
+
+    def create_room(self, rooms, room_type='OFFICE'):
+        """Create rooms in Amity.
+
         Args:
-            type: type of room (office|living).
+            type_: type of room (office|living).
             rooms: A list of room names (any string)
         Returns:
             Room(s) created.
@@ -70,6 +102,14 @@ class Amity(object):
         else:
 
             return self.add_room(rooms, room_type)
+
+    def add_office(self, room):
+        """Add office rooms to system."""
+        pass
+
+    def add_living(self, room):
+        """Add living rooms to system."""
+        pass
 
     def add_room(self, rooms, room_type):
         """Create and add room(s) to Amity."""
@@ -243,6 +283,12 @@ class Amity(object):
                 livingroom.occupants.append(person.name)
             cprint('Living space allocated successfully.', 'green')
 
+    def allocate_staff(self):
+        pass
+
+    def allocate_fellow(self):
+        pass
+
     def reallocate_person(self, person_id, new_room_name):
         """Reallocate a person from one room to another.
 
@@ -289,6 +335,12 @@ class Amity(object):
                 return self.reallocte_office(person, reallocate_room)
             else:
                 return self.reallocate_living_space(person, reallocate_room)
+
+    def reallocate_staff(self):
+        pass
+
+    def reallocate_fellow(self):
+        pass
 
     def reallocte_office(self, person, reallocate_room):
         """Reallocate office space."""
