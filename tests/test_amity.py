@@ -60,43 +60,52 @@ class AmityTests(unittest.TestCase):
         self.assertEqual(num_of_rooms + 2, num_of_rooms_after,
                          msg='Rooms added should be equal to rooms created')
 
-    # def test_add_person(self):
-    #     """Test add person functionallity."""
-    #     # test rejects creating person with abstract class
-    #     with self.assertRaises(TypeError):
-    #         Person('Ramadhan Salim')
-    #     # test adds succesfully
-    #     self.amity.add_person('Jackson Nania', 'FELLOW')
-    #     self.assertTrue('JACKSON NANIA' in
-    #                     self.amity.persons['fellows'].keys())
+    def test_add_person(self):
+        """Test add person functionallity."""
+        # test rejects creating person with abstract class
+        with self.assertRaises(TypeError):
+            Person('Ramadhan Salim')
+        # test only accepts string names
+        self.assertEqual('Invalid type', str(self.amity.add_person(34343,
+                                                                   'FELLOW')))
+        # test does not accept types other than STAFF and FELLOW
+        msg = self.amity.add_person('Samuel Bomu', 'other_type')
+        self.assertEqual('Invalid person role', str(msg))
+        # test adds succesfully
+        self.amity.add_person('Jackson Nania', 'FELLOW')
+        self.assertTrue('JACKSON NANIA' in
+                        self.amity.persons['fellows'].keys())
 
-    #     self.amity.add_person('Rehema Tanya', 'STAFF')
-    #     self.assertTrue('REHEMA TANYA' in self.amity.persons['staff'].keys())
+        self.amity.add_person('Rehema Tanya', 'STAFF')
+        self.assertTrue('REHEMA TANYA' in self.amity.persons['staff'].keys())
 
     #     # Test rejects duplicate
-    #     count_before = len(self.amity.persons['fellows'].keys())
+        count_before = len(self.amity.persons['fellows'].keys())
 
-    #     self.assertEqual('Person: Jackson Nania already exists',
-    #                      str(self.amity.add_person('Jackson Nania', 'FELLOW')))
+        self.assertEqual('Double entry not allowed',
+                         str(self.amity.add_person('Jackson Nania', 'FELLOW')))
 
-    #     count_after = len(self.amity.persons['fellows'].keys())
-    #     self.assertEqual(count_after, count_before,
-    #                      msg='Records should be consistent')
-    #     # test allocates when room available
-    #     self.amity.create_room(['Narnia'], 'OFFICE')
-    #     self.amity.add_person('Simam', 'FELLOW')
-    #     self.assertTrue(self.amity.persons['fellows']['SIMAM'].office_space ==
-    #                     'NARNIA', msg='Should allocate space')
-    #     self.amity.create_room(['Mida'], 'LIVING')
-    #     self.amity.add_person('Achach', 'FELLOW', 'Y')
-    #     self.assertTrue('MIDA' in
-    #                     self.amity.persons['fellows']['ACHACH'].living_space)
-    #     # test rejects staff accommodation
-    #     count_before = len(self.amity.persons['staff'])
-    #     count_after = len(self.amity.persons['staff'])
-    #     self.assertEqual('Staff cannot request for accommodation',
-    #                      self.amity.add_person('Ali', 'STAFF', 'Y'))
-    #     self.assertEqual(count_after, count_before, msg='No change in staff')
+        count_after = len(self.amity.persons['fellows'].keys())
+        self.assertEqual(count_after, count_before,
+                         msg='Records should be consistent')
+        # test allocates when room available
+        self.amity.create_room('Hudaa', 'OFFICE')
+        self.amity.add_person('Simam', 'FELLOW')
+        self.assertTrue(self.amity.persons['fellows']['SIMAM'].office_space)
+        self.amity.create_room(['Mida'], 'LIVING')
+        self.amity.add_person('Achach', 'FELLOW', 'Y')
+        self.assertTrue('MIDA' in
+                        self.amity.persons['fellows']['ACHACH'].living_space)
+        # test rejects staff accommodation
+        count_before = len(self.amity.persons['staff'])
+        count_after = len(self.amity.persons['staff'])
+        self.assertEqual('Invalid request',
+                         self.amity.add_person('Ali', 'STAFF', 'Y'))
+        self.assertEqual(count_after, count_before, msg='No change in staff')
+
+    def test_reallocates(self):
+        """Test reallocates people from one room to another."""
+        pass
 
 
 if __name__ == '__main__':
