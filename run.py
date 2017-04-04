@@ -37,8 +37,9 @@ docopt(__doc__, argv=None, help=True, version=0.1, options_first=False)
 
 
 def docopt_cmd(func):
-    """
-    This decorator is used to simplify the try/except block and pass the result
+    """Decorator used to simplify the try/except block.
+
+    pass the result
     of the docopt parsing to the called action.
     """
     def fn(self, arg):

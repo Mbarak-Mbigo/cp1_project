@@ -54,8 +54,8 @@ class Amity(object):
                 cprint('Room names can only be strings', 'red')
                 raise TypeError('Invalid room name type')
 
-        except (ValueError, TypeError) as e:
-            return e
+        except (ValueError, TypeError) as error:
+            return error
 
         else:
             return self._add_room(rooms, type_)
@@ -64,9 +64,9 @@ class Amity(object):
         """Create and add room(s) to Amity."""
         if room_type.upper() == "OFFICE":
             exists = self._add_office(rooms)
+
         else:
             exists = self._add_living(rooms)
-
         if not exists:
             cprint('Room(s) ' + ', '.join(rooms) + ' Created successfully',
                    'green')
@@ -132,8 +132,8 @@ class Amity(object):
                 cprint("Accommodation can either be 'Y' or 'N' ", 'red')
                 raise ValueError('Invalid accommoation type')
 
-        except (TypeError, ValueError) as e:
-            return e
+        except (TypeError, ValueError) as error:
+            return error
 
         else:
             return self._create_person(name, role, accommodation)
@@ -178,8 +178,8 @@ class Amity(object):
             if not all_pple:
                 cprint('No people in the system to allocate', 'red')
                 raise ValueError('No person yet')
-        except ValueError as e:
-            return e
+        except ValueError as error:
+            return error
 
         else:
             if name:
@@ -194,24 +194,26 @@ class Amity(object):
     def _allocate_unallocated(self):
         """Allocate unallocated people."""
         unallocated_office = [person for person in list(
-            self._get_all_pple()) if not person.office_space]
+            self._get_all_pple().values()) if not person.office_space]
         unallocated_living = [person for person in list(
-            self.persons['fellows']) if not person.living_space and
+            self.persons['fellows'].values()) if not person.living_space and
             person.accommodation == 'Y']
 
-        office_success = []
-        for person in unallocated_office:
-            self._allocate_office(person)
-            office_success.append(person.name)
-        cprint('Successful office allocations: {0}'.format(office_success),
-               'green')
+        if unallocated_office:
+            office_success = []
+            for person in unallocated_office:
+                if self._allocate_office(person) == 'Success':
+                    office_success.append(person.name)
+            cprint('Office allocations: {0}'.format(office_success),
+                   'green')
 
-        living_success = []
-        for person in unallocated_living:
-            self._allocate_living_space(person)
-            living_success.append(person.name)
-        cprint('Successful living space allocations {0}'
-               .format(living_success), 'green')
+        if unallocated_living:
+            living_success = []
+            for person in unallocated_living:
+                if self._allocate_living_space(person) == 'Success':
+                    living_success.append(person.name)
+            cprint('Living space allocations {0}'
+                   .format(living_success), 'green')
         return
 
     def _allocate_staff(self, person, accommodation):
@@ -262,90 +264,106 @@ class Amity(object):
     def reallocate_person(self, person_id, new_room_name):
         """Reallocate a person from one room to another.
 
-        reallocate_person <person_identifier> <new_room_name> -
-        Reallocate the person with person_identifier to new_room_name.
-
         Args:
-            person_id: a valid person id
-            new_room_name: a valid room
+            param:person_id: a valid person id
+            param:new_room_name: a valid room
 
         Returns:
             Reallocation status
         """
         try:
             all_rooms = self._get_all_rooms()
-            # get room to reallocate
-            if any(all_rooms):
-                reallocate_room = all_rooms.get(new_room_name.upper())
-            else:
-                raise ValueError(cprint('No rooms in the system yet', 'red'))
-            # room to reallocate not found
-            if not reallocate_room:
-                raise ValueError(cprint('{0} is not a room in the system'
-                                        .format(new_room_name), 'red'))
-            # get person
-            all_pple = self._get_all_pple()
-            if any(all_pple):
-                person = next((person for person in list(
-                    all_pple.values()) if person.id == int(person_id)), None)
-            else:
-                raise ValueError(cprint('No people in the system yet', 'red'))
-            # person not found
-            if not person:
-                raise ValueError(cprint('No person with id {0}'
-                                        .format(person_id), 'red'))
+            if not any(all_rooms):
+                cprint('No rooms in the system yet', 'red')
+                raise ValueError('No rooms')
 
-        except ValueError as e:
-            return e
+            if not self._room_exists(new_room_name):
+                cprint('{0} is not a room in the system'.format(new_room_name),
+                       'red')
+                raise ValueError('No such room')
+
+            person = self._get_person_by_id(person_id)
+            if not person:
+                raise ValueError('No such person')
+
+        except ValueError as error:
+            return error
 
         else:
-            # person found reallocate room found
-            if reallocate_room.type_ == 'OFFICE':
-                return self.reallocte_office(person, reallocate_room)
+            if person.role == 'STAFF':
+                return self._reallocate_staff(person, new_room_name)
             else:
-                return self.reallocate_living_space(person, reallocate_room)
+                return self._reallocate_fellow(person, new_room_name)
 
-    def reallocate_staff(self):
-        pass
-
-    def reallocate_fellow(self):
-        pass
-
-    def reallocte_office(self, person, reallocate_room):
-        """Reallocate office space."""
+    def _reallocate_staff(self, person, new_room_name):
+        reallocate_room = self._get_all_rooms().get(new_room_name.upper())
+        if reallocate_room.type_ == 'LIVING':
+            cprint('Cannot reallocate staff to Living space', 'red')
+            return 'Invalid operation'
         if not person.office_space:
-            return cprint('Allocate office space before reallocating.', 'red')
+            cprint('Allocate staff to office space before reallocating.',
+                   'red')
+            return 'unallocated staff'
+        else:
+            return self._reallocate_office(person, new_room_name)
+
+    def _reallocate_fellow(self, person, new_room_name):
+        reallocate_room = self._get_all_rooms().get(new_room_name.upper())
+        if reallocate_room.type_ == 'OFFICE' and person.office_space:
+            return self._reallocate_office(person, new_room_name)
+        elif reallocate_room.type_ == 'LIVING' and person.living_space:
+            return self._reallocate_living_space(person, new_room_name)
+        if not person.office_space:
+            cprint('Allocate fellow office space before reallocating.', 'red')
+            return 'unallocated fellow office'
+        if not person.living_space:
+            cprint('Allocate fellow living space before reallocating.', 'red')
+            return 'unallocated fellow living'
+
+    def _get_person_by_id(self, person_id):
+        """Return person object if exists."""
+        all_pple = self._get_all_pple()
+        if any(all_pple):
+            person = next((person for person in list(
+                all_pple.values()) if person.id == int(person_id)), None)
+            return person
+        else:
+            return None
+
+    def _reallocate_office(self, person, new_room_name):
+        reallocate_room = self._get_all_rooms().get(new_room_name.upper())
+        if reallocate_room.type_ == 'LIVING':
+            cprint('Cannot reallocate from office to Living space', 'red')
+            return 'Invalid operation'
         else:
             current_office = self.rooms['offices'][person.office_space]
             if current_office == reallocate_room:
-                return cprint('Cannot reallocate to the same office', 'red')
-            elif current_office.type_ is not reallocate_room.type_:
-                return cprint('Cannot reallocate from office to living', 'red')
+                cprint('Cannot reallocate to the same office', 'red')
+                return 'Same office'
             else:
                 current_office.occupants.remove(person.name)
                 reallocate_room.occupants.append(person.name)
                 person.office_space = reallocate_room.name
-                print('my reallocated office space: {0}'.format(person.office_space))
                 cprint("Reallocation of office space successful.", 'green')
+                return 'Success'
 
-    def reallocate_living_space(self, person, reallocate_room):
+    def _reallocate_living_space(self, person, new_room_name):
         """Reallocate living space."""
-        if person.role == 'STAFF':
-            return cprint('Cannot reallocate staff to living space', 'red')
-        elif person.role == 'FELLOW' and not person.living_space:
-            return cprint('Allocate living space before reallocateding', 'red')
+        reallocate_room = self._get_all_rooms().get(new_room_name.upper())
+        if reallocate_room.type_ == 'OFFICE':
+            cprint('Cannot reallocate from living to office space', 'red')
+            return 'Invalid operation'
         else:
             current_living = self.rooms['livingspaces'][person.living_space]
             if current_living == reallocate_room:
-                return cprint('Cannot reallocate to same living space', 'red')
-            elif current_living.type_ is not reallocate_room.type_:
-                return cprint('Cannot reallocate from living to office', 'red')
+                cprint('Cannot reallocate to same living space', 'red')
+                return 'Invalid operation'
             else:
                 current_living.occupants.remove(person.name)
                 reallocate_room.occupants.append(person.name)
                 person.living_space = reallocate_room.name
-                return cprint('Reallocation to living space successful.',
-                              'green')
+                cprint('Reallocation to living space successful.', 'green')
+                return 'Success'
 
     def load_people(self, filename):
         """"Add people to rooms from a txt file.
@@ -466,18 +484,19 @@ class Amity(object):
         """
         try:
             if not any(dict(self.persons['staff'], **self.persons['fellows'])):
-                raise ValueError(cprint("No people in the system", 'red'))
+                cprint("No people in the system", 'red')
+                raise ValueError('Empty')
 
-        except ValueError as e:
-            return e
+        except ValueError as error:
+            return error
         else:
             all_persons = list(self.persons['staff'].values()) + list(
                 self.persons['fellows'].values())
             unallocated_office = [
-                p for p in all_persons if p.office_space is None]
+                person for person in all_persons if person.office_space is None]
             unallocated_living = [
-                l for l in all_persons if l.role is 'FELLOW' and
-                l.accommodation is 'Y' and l.living_space is None]
+                person for person in all_persons if person.role is 'FELLOW' and
+                person.accommodation is 'Y' and person.living_space is None]
             if outfile:
                 filepath = ''.join(['data/', outfile])
             else:
@@ -495,6 +514,9 @@ class Amity(object):
                         for person in unallocated_living:
                             f.write(str(person))
                             f.write('\n')
+            if not unallocated_office and not unallocated_living:
+                cprint('No unallocated persons', 'green')
+                return 'all allocated'
 
             cprint("\nUNALLOCATED OFFICE SPACE", 'green')
             print("-----------------------------------")
@@ -663,7 +685,7 @@ class Amity(object):
                     cur = conn.cursor()
                     cprint(db.load(self.rooms, self.persons, cur), 'white')
             else:
-                print(cprint('Invalid Connection', 'red'))
+                cprint('Invalid Connection', 'red')
         finally:
             if conn:
                 conn.close()

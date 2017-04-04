@@ -26,8 +26,11 @@ class AmityTests(unittest.TestCase):
         self.amity = Amity()
 
     def tearDown(self):
-        """Create necessary objects."""
-        del self.amity
+        """Reset necessary objects."""
+        self.amity.rooms['offices'] = dict()
+        self.amity.rooms['livingspaces'] = dict()
+        self.amity.persons['staff'] = dict()
+        self.amity.persons['fellows'] = dict()
 
     def test_creates_room(self):
         """Test rooms are created successfully."""
@@ -89,7 +92,7 @@ class AmityTests(unittest.TestCase):
         self.assertEqual(count_after, count_before,
                          msg='Records should be consistent')
         # test allocates when room available
-        self.amity.create_room('Hudaa', 'OFFICE')
+        self.amity.create_room(['Hudaa'], 'OFFICE')
         self.amity.add_person('Simam', 'FELLOW')
         self.assertTrue(self.amity.persons['fellows']['SIMAM'].office_space)
         self.amity.create_room(['Mida'], 'LIVING')
@@ -102,10 +105,78 @@ class AmityTests(unittest.TestCase):
         self.assertEqual('Invalid request',
                          self.amity.add_person('Ali', 'STAFF', 'Y'))
         self.assertEqual(count_after, count_before, msg='No change in staff')
+        self.assertEqual(str(self.amity.add_person('Amir', 'fellow', 'Z')),
+                         'Invalid accommoation type')
 
     def test_reallocates(self):
         """Test reallocates people from one room to another."""
-        pass
+        # Does not reallocate to non existent room
+        self.assertEqual(len(self.amity._get_all_rooms()), 0)
+        self.amity.add_person('Salma', 'STAFF')
+        self.amity.add_person('Naidy', 'fellow')
+        msg = self.amity.reallocate_person(
+            self.amity.persons['staff']['SALMA'].id, 'Zen')
+        self.assertEqual('No rooms', str(msg))
+        self.amity.create_room(['Subra'], 'office')
+        msg = self.amity.reallocate_person(
+            self.amity.persons['staff']['SALMA'].id, 'Zen')
+        self.assertEqual('No such room', str(msg))
+        # Handles nonexistent person
+        self.assertEqual(str(self.amity.reallocate_person(324, 'Subra')),
+                         'No such person')
+        # Does not reallocate unallocated
+        self.assertEqual(self.amity.reallocate_person(
+            self.amity.persons['staff']['SALMA'].id, 'Subra'),
+            'unallocated staff')
+        self.assertEqual(self.amity.reallocate_person(
+            self.amity.persons['fellows']['NAIDY'].id, 'Subra'),
+            'unallocated fellow office')
+        # Does not reallocate staff to living space
+        self.amity.allocate_room('Salma')
+        self.amity.create_room(['Mida'], 'living')
+        self.assertEqual(self.amity.reallocate_person(
+            self.amity.persons['staff']['SALMA'].id, 'Mida'),
+            'Invalid operation')
+        # Does not reallocate to the same office
+        self.assertEqual(self.amity.reallocate_person(
+            self.amity.persons['staff']['SALMA'].id, 'Subra'),
+            'Same office')
+        # Reallocates office space
+        self.amity.create_room(['Nadra'], 'office')
+        self.assertEqual(self.amity.reallocate_person(
+            self.amity.persons['staff']['SALMA'].id, 'Nadra'),
+            'Success')
+        self.assertTrue(self.amity.persons['staff']['SALMA'].office_space ==
+                        'NADRA')
+        # Reallocates living space
+        self.amity.add_person('Samuel', 'fellow', 'Y')
+        self.amity.create_room(['React'], 'living')
+        # Does not reallocate to the same living room
+        msg = self.amity.reallocate_person(
+            self.amity.persons['fellows']['SAMUEL'].id, 'Mida')
+        self.assertFalse(msg == 'Success')
+        msg = self.amity.reallocate_person(
+            self.amity.persons['fellows']['SAMUEL'].id, 'React')
+        self.assertTrue(msg == 'Success')
+        self.amity.allocate_room('Naidy')
+        self.assertEqual(self.amity.reallocate_person(
+            self.amity.persons['fellows']['NAIDY'].id, 'React'),
+            'unallocated fellow living')
+
+    def test_allocates_unallocated(self):
+        """Test allocates unallocated."""
+        # Does not allocate if not people in the system
+        self.assertTrue(str(self.amity.allocate_room()) == 'No person yet')
+        self.amity.add_person('Amina', 'fellow', 'Y')
+        self.amity.add_person('Ridhaa', 'fellow')
+        self.amity.add_person('Faizi', 'staff')
+        self.amity.add_person('Aladin', 'staff')
+        self.amity.create_room(['Tida'], 'office')
+        self.amity.create_room(['Runda'], 'living')
+        self.amity.allocate_room()
+        self.assertTrue(self.amity.print_unallocated() == 'all allocated')
+
+
 
 
 if __name__ == '__main__':
