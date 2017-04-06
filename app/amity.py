@@ -388,14 +388,13 @@ class Amity(object):
         try:
             filepath = ''.join(['data/', filename])
             if not os.path.exists(filepath):
-                cprint("Loading file not found", 'red')
-                raise FileNotFoundError('Invalid path')
+                raise FileNotFoundError(cprint("Loading file not found",
+                                               'red'))
             elif os.stat(filepath).st_size == 0:
-                cprint("File is empty", 'red')
-                return 'Empty file'
+                return cprint("File is empty", 'red')
 
-        except FileNotFoundError as error:
-            return error
+        except FileNotFoundError as e:
+            return e
         else:
             with open(filepath) as f:
                 for line in f:
@@ -407,8 +406,7 @@ class Amity(object):
                         self.add_person(name, person_type, person_details[-1])
                     else:
                         self.add_person(name, person_type)
-                cprint("Loading operation successful", 'white')
-                return 'success'
+                return cprint("Loading operation successful", 'white')
 
     def print_allocations(self, outfile=None):
         """"Print to the screen a list of rooms and the people allocated.
@@ -425,52 +423,44 @@ class Amity(object):
 
         """
         try:
-            if not any(self._get_all_rooms()):
-                cprint("No rooms available", 'red')
-                raise ValueError('No rooms')
+            if not any(self.rooms):
+                raise ValueError(cprint("No rooms available", 'red'))
             else:
-                occupied_offices = [room for room in list(
-                    self.rooms['offices'].values()) if len(room.occupants) > 0]
-                occupied_living = [room for room in list(
+                occupied_offices = [o for o in list(
+                    self.rooms['offices'].values()) if len(o.occupants) > 0]
+                occupied_living = [l for l in list(
                     self.rooms['livingspaces'].values()) if len(
-                        room.occupants) > 0]
-                if not occupied_offices and not occupied_living:
-                    cprint("\nThere are no allocations\n", 'red')
-                    return 'No allocations'
+                        l.occupants) > 0]
+                if len(occupied_offices) == 0 and len(occupied_living) == 0:
+                    return(cprint("\nThere are no allocations\n", 'red'))
 
-        except ValueError as error:
-            return error
+        except ValueError as e:
+            return e
         else:
-            rooms = occupied_offices + occupied_living
-
-            cprint("ALLOCATIONS", 'white')
-            all_pple = self._get_all_pple()
-            for room in rooms:
+            if outfile:
+                filepath = ''.join(['data/', outfile])
+            else:
+                filepath = outfile
+            if filepath:
+                with open(filepath, "w") as f:
+                    for room in (occupied_offices + occupied_living):
+                        f.write(room.name + '\n')
+                        f.write(", ".join(room.occupants))
+                        f.write('\n')
+            print(cprint("ALLOCATIONS", 'white'))
+            all_pple = dict(self.persons['staff'], **self.persons['fellows'])
+            for room in (occupied_offices + occupied_living):
                 print(cprint("Room: {0} Type: {1}".format(
                     room.name, room.type_), 'green'))
                 print("--------------------------------")
                 print_data = []
                 for name in room.occupants:
-                    person = all_pple.get(name.upper())
+                    person = all_pple[name]
                     print_data.append([person.id, person.name, person.role])
                 print(tabulate(print_data, headers=['ID', 'NAME', 'TYPE'],
                                tablefmt='orgtbl'))
                 print("--------------------------------")
-
-            if outfile:
-                return self._write_allocations(outfile, rooms)
-            else:
-                return 'print success'
-
-    def _write_allocations(self, outfile, rooms):
-        """Save allocations to file."""
-        filepath = ''.join(['data/', outfile])
-        with open(filepath, "w") as file:
-            for room in rooms:
-                file.write(room.name + '\n')
-                file.write(", ".join(room.occupants))
-                file.write('\n')
-            return 'Success'
+            return
 
     def print_unallocated(self, outfile=None):
         """"Print a list of all unallocated people.
@@ -493,7 +483,7 @@ class Amity(object):
             output to file too.
         """
         try:
-            if not any(self._get_all_pple()):
+            if not any(dict(self.persons['staff'], **self.persons['fellows'])):
                 cprint("No people in the system", 'red')
                 raise ValueError('Empty')
 
@@ -503,72 +493,56 @@ class Amity(object):
             all_persons = list(self.persons['staff'].values()) + list(
                 self.persons['fellows'].values())
             unallocated_office = [
-                person for person in all_persons if not person.office_space]
+                person for person in all_persons if person.office_space is None]
             unallocated_living = [
                 person for person in all_persons if person.role is 'FELLOW' and
-                person.accommodation is 'Y' and not person.living_space]
-            self._unallocated_office(unallocated_office)
-            self._unallocated_living(unallocated_living)
-        if not unallocated_office and not unallocated_living:
-            return 'No unallocated'
-        else:
+                person.accommodation is 'Y' and person.living_space is None]
             if outfile:
                 filepath = ''.join(['data/', outfile])
             else:
                 filepath = outfile
-            if filepath:
-                return self._write_unallocated(filepath, unallocated_office,
-                                               unallocated_living)
-            else:
-                return 'unallocated exists'
 
-    def _unallocated_office(self, data):
-        if data:
-            print_data = []
+            if filepath:
+                with open(filepath, 'w') as f:
+                    if unallocated_office:
+                        f.write("UNALLOCATED OFFICE SPACE \n")
+                        for person in unallocated_office:
+                            f.write(str(person))
+                            f.write('\n')
+                    if unallocated_living:
+                        f.write("UNALLOCATED LIVING SPACE \n")
+                        for person in unallocated_living:
+                            f.write(str(person))
+                            f.write('\n')
+            if not unallocated_office and not unallocated_living:
+                cprint('No unallocated persons', 'green')
+                return 'all allocated'
+
             cprint("\nUNALLOCATED OFFICE SPACE", 'green')
             print("-----------------------------------")
-            for person in data:
-                print_data.append([person.id, person.name, person.role])
-            print(tabulate(print_data, headers=['ID', 'NAME', 'TYPE'],
-                           tablefmt='orgtbl'))
-            print("-----------------------------------")
-            return 'success office write'
-        else:
-            cprint('No unallocated office space', 'red')
-
-    def _unallocated_living(self, data):
-        if data:
             print_data = []
-            cprint("\nUNALLOCATED LIVING SPACE", 'green')
-            print("----------------------------------------------------")
-            for person in data:
-                print_data.append([person.id, person.name, person.role,
-                                  person.accommodation])
-            print(tabulate(print_data, headers=['ID', 'NAME', 'TYPE',
-                           'ACCOMMODATION'],
-                           tablefmt='orgtbl'))
-            print("----------------------------------------------------")
-            return 'success living write'
-        else:
-            cprint('No unallcoated living space', 'red')
-
-    def _write_unallocated(self, filepath, office_data, living_data):
-        with open(filepath, 'w') as f:
-            if office_data:
-                f.write("UNALLOCATED OFFICE SPACE \n")
-                for person in office_data:
-                    f.write(str(person))
-                    f.write('\n')
-            if living_data:
-                f.write("\nUNALLOCATED LIVING SPACE \n")
-                for person in living_data:
-                    f.write(str(person))
-                    f.write('\n')
-            cprint('writing to file successful', 'white')
-        if office_data or living_data:
-            return 'success write'
-        else:
-            return None
+            if unallocated_office:
+                for person in unallocated_office:
+                    print_data.append([person.id, person.name, person.role])
+                print(tabulate(print_data, headers=['ID', 'NAME', 'TYPE'],
+                               tablefmt='orgtbl'))
+                print("-----------------------------------")
+                cprint("\nUNALLOCATED LIVING SPACE", 'green')
+                print("----------------------------------------------------")
+            else:
+                cprint('No unallocated office space', 'red')
+            print_data = []
+            if unallocated_living:
+                for person in unallocated_living:
+                    print_data.append([person.id, person.name, person.role,
+                                      person.accommodation])
+                print(tabulate(print_data, headers=['ID', 'NAME', 'TYPE',
+                               'ACCOMMODATION'],
+                               tablefmt='orgtbl'))
+                print("----------------------------------------------------")
+            else:
+                cprint('No unallcoated living space', 'red')
+            return cprint('Operation successful.', 'white')
 
     def print_room(self, room_name):
         """"Given a room name, print all the people allocated to that room.
@@ -586,8 +560,8 @@ class Amity(object):
             all_rooms = self._get_all_rooms()
             if not all_rooms.get(room_name.upper()):
                 raise ValueError("No room with name: {0}".format(room_name))
-        except ValueError as error:
-            return error
+        except ValueError as e:
+            return e
         else:
             all_pple = self._get_all_pple()
             room = all_rooms[room_name.upper()]
@@ -595,7 +569,6 @@ class Amity(object):
             print('----------------------------------')
             if not room.occupants:
                 cprint('No allocations yet', 'red')
-                return 'No allocations'
             else:
                 print_data = []
                 for name in room.occupants:
@@ -604,7 +577,6 @@ class Amity(object):
                 print(tabulate(print_data, headers=['ID', 'NAME', 'TYPE'],
                                tablefmt='orgtbl'))
                 print('----------------------------------')
-                return 'Success'
 
     def save_state(self, database=None):
         """"Persist all data in a db.
@@ -632,8 +604,8 @@ class Amity(object):
                 print('{0} Created successfully'.format(dbpath))
             conn = db.create_connection(dbpath)
 
-        except Exception as error:
-            return error
+        except Exception as e:
+            return e
         else:
             if conn:
                 with conn:
@@ -644,7 +616,6 @@ class Amity(object):
                     db.save_staff(self.persons['staff'], cur)
                     db.save_fellow(self.persons['fellows'], cur)
                     print('Done...')
-                    return 'save successful'
         finally:
             if conn:
                 conn.close()
@@ -671,28 +642,48 @@ class Amity(object):
                 dbpath = ''.join(['databases/', database])
             else:
                 dbpath = ''.join(['databases/', 'amity_default.db'])
+                # dbpath not given, get latest db back up
+                choice_db = 'databases/amity_default.db'
+                for file in os.listdir('databases'):
+                    if file.endswith('.db'):
+                        current_db = ''.join(['databases/', file])
+                        if os.stat(current_db).st_mtime >= os.stat(
+                                choice_db).st_mtime:
+                            choice_db = current_db
+                dbpath = choice_db
 
+            # check db existence
             if not os.path.exists(dbpath):
-                cprint('{0} database not found\n'.format(database), 'red')
-                raise FileNotFoundError('database does not exist')
+                raise FileNotFoundError(cprint(
+                    '{0} database not found\n'.format(database), 'red'))
 
-        except FileNotFoundError as error:
-            return error
+        except FileNotFoundError as e:
+            return e
         else:
             # db exists
             conn = db.create_connection(dbpath)
-            cur = None
             if conn:
                 all_pple = self._get_all_pple()
                 all_rooms = self._get_all_rooms()
                 if any(all_pple) or any(all_rooms):
-                    self.rooms['offices'] = dict()
-                    self.rooms['livingspaces'] = dict()
-                    self.persons['staff'] = dict()
-                    self.persons['fellows'] = dict()
+                    cprint('Current applicaton data will be overwriten!\n',
+                           'red')
+                    choice = input('Enter:"y" to continue, "n" to Cancel ')
+                    while choice not in ['n', 'N', 'y', 'Y']:
+                        cprint('Invalid choice:{0}'.format(choice), 'red')
+                        choice = input('Enter:"y" to continue,'
+                                       '"n" to Cancel: ')
+                    else:
+                        if choice in ['y', 'Y']:
+                            print('updating... \n')
+                            cur = conn.cursor()
+                            cprint(db.load(self.rooms, self.persons, cur),
+                                   'white')
+                        elif choice in ['n', 'N']:
+                            cprint('\nOperation cancelled', 'green')
                 else:
                     cur = conn.cursor()
-                return db.load(self.rooms, self.persons, cur)
+                    cprint(db.load(self.rooms, self.persons, cur), 'white')
             else:
                 cprint('Invalid Connection', 'red')
         finally:
@@ -712,11 +703,10 @@ class Amity(object):
         try:
             all_rooms = self._get_all_rooms()
             if not any(all_rooms):
-                cprint('No space available', 'red')
-                raise ValueError("No space available")
+                raise ValueError("No room space available")
 
-        except ValueError as error:
-            return error
+        except ValueError as e:
+            cprint('\nStatus: {0}'.format(e), 'red')
         else:
             office_space = [room for room in list(self.rooms[
                 'offices'].values()) if len(room.occupants) < 6]
@@ -745,7 +735,6 @@ class Amity(object):
                 print('--------------------')
             else:
                 cprint('No living space available', 'red')
-            return 'success'
 
     def _get_random_room(self, room_type):
         """Return a room name or None."""

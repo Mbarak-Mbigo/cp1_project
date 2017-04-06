@@ -9,7 +9,7 @@ Process:
 """
 # imports
 import unittest
-from unittest.mock import patch
+import unittest.mock
 
 # local imports
 from app.amity import Amity
@@ -163,11 +163,10 @@ class AmityTests(unittest.TestCase):
             self.amity.persons['fellows']['NAIDY'].id, 'React'),
             'unallocated fellow living')
 
-    def test_unallocated_persons(self):
-        """Test allocates unallocated and prints unallocated."""
+    def test_allocates_unallocated(self):
+        """Test allocates unallocated."""
         # Does not allocate if not people in the system
         self.assertTrue(str(self.amity.allocate_room()) == 'No person yet')
-        self.assertEqual(str(self.amity.print_unallocated()), 'Empty')
         self.amity.add_person('Amina', 'fellow', 'Y')
         self.amity.add_person('Ridhaa', 'fellow')
         self.amity.add_person('Faizi', 'staff')
@@ -175,80 +174,9 @@ class AmityTests(unittest.TestCase):
         self.amity.create_room(['Tida'], 'office')
         self.amity.create_room(['Runda'], 'living')
         self.amity.allocate_room()
-        self.assertEqual(self.amity.print_unallocated(), 'No unallocated')
+        self.assertTrue(self.amity.print_unallocated() == 'all allocated')
 
-    def test_print_room(self):
-        """Test print room allocation details."""
-        # Handles nonexistent room
-        self.assertTrue(str(self.amity.print_room('Linter')) ==
-                        'No room with name: Linter')
-        # Reports contextual feedback
-        self.amity.create_room(['Linter'], 'office')
-        self.assertEqual(self.amity.print_room('Linter'), 'No allocations')
-        self.amity.add_person('Dennis Mwangi', 'staff')
-        self.amity.add_person('Evans Nduati', 'fellow')
-        self.assertEqual(self.amity.print_room('Linter'), 'Success')
 
-    def test_print_allocations(self):
-        """Test allocations are printed and handled accordingly."""
-        # Reports contextual feedback
-        self.assertTrue(str(self.amity.print_allocations()) == 'No rooms')
-        self.amity.create_room(['Oval'], 'office')
-        self.amity.create_room(['Square'], 'living')
-        self.assertTrue(str(self.amity.print_allocations()) ==
-                        'No allocations')
-        self.amity.add_person('Rukia Adam', 'staff')
-        self.amity.add_person('Eugene Said', 'fellow', 'Y')
-        self.assertEqual(str(self.amity.print_allocations()), 'print success')
-        self.assertEqual(str(self.amity.print_allocations('allocations.txt')),
-                         'Success')
-
-    @patch('app.amity.os')
-    def test_load_people(self, mock_os):
-        """Test load_people."""
-        mock_os.path.exists.return_value = False
-        self.amity.load_people('mock_data.txt')
-        self.assertFalse(mock_os.stat.called, 'Invalid path')
-
-        mock_os.path.exists.return_value = True
-        mock_os.stat('data/mock_data.txt').st_size = 0
-        self.assertTrue(self.amity.load_people('mock_data.txt') ==
-                        'Empty file')
-
-    def test_load_people_with_data(self):
-        """Test data loaded successfully."""
-        self.assertTrue(self.amity.load_people('load.txt') == 'success')
-
-    def test_print_unallocated(self):
-        """Test unallocated people are printed and saved to file."""
-        self.amity.add_person('Cynthia Simon', 'staff')
-        self.amity.add_person('Rudisha Said', 'staff')
-        self.amity.add_person('Maureen Muriithi', 'fellow')
-        self.amity.add_person('Ali Daudi', 'fellow', 'Y')
-        self.assertTrue(self.amity.print_unallocated() == 'unallocated exists')
-        self.assertEqual(self.amity.print_unallocated('unallocated.txt'),
-                         'success write')
-
-    def test_print_available_space(self):
-        """Test printing available space functionality."""
-        self.assertTrue(str(self.amity.print_available_space()),
-                        'No space available')
-        self.amity.create_room(['Nina', 'Twina'], 'office')
-        self.amity.create_room(['Swift', 'Shina'], 'living')
-        self.assertTrue(str(self.amity.print_available_space()),
-                        'success')
-
-    def test_save_state(self):
-        """Test states are saved successfully."""
-        self.assertTrue(self.amity.save_state() == 'save successful')
-
-    def test_load_state(self):
-        """Test loads data from database."""
-        self.assertEqual(str(self.amity.load_state('nonexistent.db')),
-                         'database does not exist')
-        self.amity.create_room(['Lina', 'Tina'], 'office')
-        self.assertEqual(self.amity.load_state('amity_default.db'),
-                         'Operation complete')
 
 
 if __name__ == '__main__':

@@ -51,7 +51,7 @@ def load(rooms, persons, cur):
     load_living(rooms['livingspaces'], cur)
     load_staff(persons['staff'], cur)
     load_fellow(persons['fellows'], cur)
-    return 'Operation complete'
+    return 'Operation complete...'
 
 
 def save_to_db(rooms, persons, cur):
@@ -87,15 +87,15 @@ def load_office(dictoffice, cur):
     try:
         # check table exists
         cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
-                    ' name="offices"')
+                    'name="offices"')
         table = cur.fetchone()[0]
         if table == 0:
             raise AttributeError('Database does not have table:{0}!'
                                  .format('offices'))
         # check table has data
 
-    except AttributeError as error:
-        return error
+    except AttributeError as e:
+        return e
     else:
         # check for records
         cur.execute('''SELECT COUNT(*) FROM offices''')
@@ -136,7 +136,7 @@ def load_living(dictliving, cur):
     try:
         # check table exists
         cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
-                    ' name="livingspaces"')
+                    'name="livingspaces"')
         table = cur.fetchone()[0]
         if table == 0:
             raise AttributeError('Database does not have table:{0}!'
@@ -181,7 +181,7 @@ def load_staff(dictstaff, cur):
     try:
         # check table exists
         cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
-                    ' name="staff"')
+                    'name="staff"')
         table = cur.fetchone()[0]
         if table == 0:
             raise AttributeError('Database does not have table:{0}!'
@@ -228,7 +228,7 @@ def load_fellow(dictfellow, cur):
     try:
         # check table exists
         cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
-                    ' name="fellows"')
+                    'name="fellows"')
         table = cur.fetchone()[0]
         if table == 0:
             raise AttributeError('Database does not have table:{0}!'
