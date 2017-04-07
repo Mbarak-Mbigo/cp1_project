@@ -270,6 +270,9 @@ class AmityTests(unittest.TestCase):
 
     def test_load_state(self):
         """Test loads data from database."""
+        self.assertEqual(str(self.amity.load_state('nonexistent.db')),
+                         'database does not exist')
+
         self.assertEqual(self.amity.load_state('testdata.db'),
                          'Operation complete')
 
