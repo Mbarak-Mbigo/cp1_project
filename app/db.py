@@ -8,12 +8,12 @@ import sqlite3
 from sqlite3 import Error
 from ast import literal_eval
 
+# 3rd party imports
+from termcolor import cprint
+
 # local imports
 from app.room import Office, Living
 from app.person import Staff, Fellow
-
-# 3rd party imports
-# local imports
 
 
 def create_connection(database):
@@ -54,11 +54,6 @@ def load(rooms, persons, cur):
     return 'Operation complete'
 
 
-def save_to_db(rooms, persons, cur):
-    """Save state to database."""
-    save_office(dictoffice, cur)
-
-
 def save_office(dictoffice, cur):
     """Save office rooms data into database table offices."""
     # check for data existence
@@ -86,8 +81,7 @@ def load_office(dictoffice, cur):
     """Load office rooms data to application."""
     try:
         # check table exists
-        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
-                    ' name="offices"')
+        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="offices"')
         table = cur.fetchone()[0]
         if table == 0:
             raise AttributeError('Database does not have table:{0}!'
@@ -104,6 +98,7 @@ def load_office(dictoffice, cur):
             for record in records:
                 dictoffice[record[1]] = Office(record[1], record[0],
                                                literal_eval(record[3]))
+            cprint('offices data loaded successfully.', 'green')
 
 
 def save_living(dictliving, cur):
@@ -133,8 +128,7 @@ def load_living(dictliving, cur):
     """Load living rooms to application."""
     try:
         # check table exists
-        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
-                    ' name="livingspaces"')
+        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="livingspaces"')
         table = cur.fetchone()[0]
         if table == 0:
             raise AttributeError('Database does not have table:{0}!'
@@ -178,8 +172,7 @@ def load_staff(dictstaff, cur):
     """Load staff to application."""
     try:
         # check table exists
-        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
-                    ' name="staff"')
+        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="staff"')
         table = cur.fetchone()[0]
         if table == 0:
             raise AttributeError('Database does not have table:{0}!'
@@ -225,8 +218,7 @@ def load_fellow(dictfellow, cur):
     """Load staff to application."""
     try:
         # check table exists
-        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
-                    ' name="fellows"')
+        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="fellows"')
         table = cur.fetchone()[0]
         if table == 0:
             raise AttributeError('Database does not have table:{0}!'
