@@ -8,12 +8,12 @@ import sqlite3
 from sqlite3 import Error
 from ast import literal_eval
 
+# 3rd party imports
+from termcolor import cprint
+
 # local imports
 from app.room import Office, Living
 from app.person import Staff, Fellow
-
-# 3rd party imports
-# local imports
 
 
 def create_connection(database):
@@ -45,20 +45,6 @@ def load_schema(db, db_schema='databases/amity_default.sql'):
             cur.executescript(schema)
 
 
-def load(rooms, persons, cur):
-    """Load state to application."""
-    load_office(rooms['offices'], cur)
-    load_living(rooms['livingspaces'], cur)
-    load_staff(persons['staff'], cur)
-    load_fellow(persons['fellows'], cur)
-    return 'Operation complete...'
-
-
-def save_to_db(rooms, persons, cur):
-    """Save state to database."""
-    save_office(dictoffice, cur)
-
-
 def save_office(dictoffice, cur):
     """Save office rooms data into database table offices."""
     # check for data existence
@@ -84,28 +70,15 @@ def save_office(dictoffice, cur):
 
 def load_office(dictoffice, cur):
     """Load office rooms data to application."""
-    try:
-        # check table exists
-        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
-                    'name="offices"')
-        table = cur.fetchone()[0]
-        if table == 0:
-            raise AttributeError('Database does not have table:{0}!'
-                                 .format('offices'))
-        # check table has data
-
-    except AttributeError as e:
-        return e
-    else:
-        # check for records
-        cur.execute('''SELECT COUNT(*) FROM offices''')
-        records_count = cur.fetchone()[0]
-        if not records_count == 0:
-            cur.execute('''SELECT * FROM offices''')
-            records = cur.fetchall()
-            for record in records:
-                dictoffice[record[1]] = Office(record[1], record[0],
-                                               literal_eval(record[3]))
+    cur.execute('''SELECT COUNT(*) FROM offices''')
+    records_count = cur.fetchone()[0]
+    if not records_count == 0:
+        cur.execute('''SELECT * FROM offices''')
+        records = cur.fetchall()
+        for record in records:
+            dictoffice[record[1]] = Office(record[1], record[0],
+                                           literal_eval(record[3]))
+        cprint('offices data loaded successfully.', 'green')
 
 
 def save_living(dictliving, cur):
@@ -133,27 +106,15 @@ def save_living(dictliving, cur):
 
 def load_living(dictliving, cur):
     """Load living rooms to application."""
-    try:
-        # check table exists
-        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
-                    'name="livingspaces"')
-        table = cur.fetchone()[0]
-        if table == 0:
-            raise AttributeError('Database does not have table:{0}!'
-                                 .format('livingspaces'))
-
-    except AttributeError as e:
-        return e
-    else:
-        # check for records
-        cur.execute('''SELECT COUNT(*) FROM livingspaces''')
-        records_count = cur.fetchone()[0]
-        if not records_count == 0:
-            cur.execute('''SELECT * FROM livingspaces''')
-            records = cur.fetchall()
-            for record in records:
-                dictliving[record[1]] = Living(record[1], record[0],
-                                               literal_eval(record[3]))
+    cur.execute('''SELECT COUNT(*) FROM livingspaces''')
+    records_count = cur.fetchone()[0]
+    if not records_count == 0:
+        cur.execute('''SELECT * FROM livingspaces''')
+        records = cur.fetchall()
+        for record in records:
+            dictliving[record[1]] = Living(record[1], record[0],
+                                           literal_eval(record[3]))
+        cprint('Living rooms data loaded successfully.', 'green')
 
 
 def save_staff(dictstaff, cur):
@@ -178,26 +139,14 @@ def save_staff(dictstaff, cur):
 
 def load_staff(dictstaff, cur):
     """Load staff to application."""
-    try:
-        # check table exists
-        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
-                    'name="staff"')
-        table = cur.fetchone()[0]
-        if table == 0:
-            raise AttributeError('Database does not have table:{0}!'
-                                 .format('staff'))
-
-    except AttributeError as e:
-        return e
-    else:
-        # check for records
-        cur.execute('''SELECT COUNT(*) FROM staff''')
-        records_count = cur.fetchone()[0]
-        if not records_count == 0:
-            cur.execute('''SELECT * FROM staff''')
-            records = cur.fetchall()
-            for record in records:
-                dictstaff[record[1]] = Staff(record[1], record[0], record[3])
+    cur.execute('''SELECT COUNT(*) FROM staff''')
+    records_count = cur.fetchone()[0]
+    if not records_count == 0:
+        cur.execute('''SELECT * FROM staff''')
+        records = cur.fetchall()
+        for record in records:
+            dictstaff[record[1]] = Staff(record[1], record[0], record[3])
+        cprint('staff data loaded successfully.', 'green')
 
 
 def save_fellow(dictfellow, cur):
@@ -225,24 +174,12 @@ def save_fellow(dictfellow, cur):
 
 def load_fellow(dictfellow, cur):
     """Load staff to application."""
-    try:
-        # check table exists
-        cur.execute('SELECT name FROM sqlite_master WHERE type="table" AND'
-                    'name="fellows"')
-        table = cur.fetchone()[0]
-        if table == 0:
-            raise AttributeError('Database does not have table:{0}!'
-                                 .format('fellows'))
-
-    except AttributeError as e:
-        return e
-    else:
-        # check for records
-        cur.execute('''SELECT COUNT(*) FROM fellows''')
-        records_count = cur.fetchone()[0]
-        if not records_count == 0:
-            cur.execute('''SELECT * FROM fellows''')
-            records = cur.fetchall()
-            for record in records:
-                dictfellow[record[1]] = Fellow(record[1], record[0], record[3],
-                                               record[5], record[4])
+    cur.execute('''SELECT COUNT(*) FROM fellows''')
+    records_count = cur.fetchone()[0]
+    if not records_count == 0:
+        cur.execute('''SELECT * FROM fellows''')
+        records = cur.fetchall()
+        for record in records:
+            dictfellow[record[1]] = Fellow(record[1], record[0], record[3],
+                                           record[5], record[4])
+        cprint('Fellows data loaded successfully.', 'green')
