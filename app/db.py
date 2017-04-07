@@ -92,8 +92,6 @@ def load_office(dictoffice, cur):
         if table == 0:
             raise AttributeError('Database does not have table:{0}!'
                                  .format('offices'))
-        # check table has data
-
     except AttributeError as error:
         return error
     else:

@@ -735,7 +735,7 @@ class Amity(object):
                 cprint('No office space available', 'red')
             if living_space:
                 print('--------------------')
-                print('\nLiving Space')
+                cprint('Living Space:', 'green')
                 print_data = []
                 print('--------------------')
                 for room in living_space:

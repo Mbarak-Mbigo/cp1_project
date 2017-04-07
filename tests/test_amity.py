@@ -14,8 +14,8 @@ import os
 
 # local imports
 from app.amity import Amity
-from app.room import Room
-from app.person import Person
+from app.room import Room, Office, Living
+from app.person import Person, Staff, Fellow
 
 
 class AmityTests(unittest.TestCase):
@@ -33,11 +33,27 @@ class AmityTests(unittest.TestCase):
         self.amity.persons['staff'] = dict()
         self.amity.persons['fellows'] = dict()
 
+    def test_person_functionality(self):
+        """Test person functionality."""
+        with self.assertRaises(TypeError):
+            Person('Rudish Salim')
+        staff = Staff('Amina Buhari', 1654)
+        self.assertEqual('STAFF (id:1654 name:AMINA BUHARI office:None)',
+                         repr(staff))
+
+        fellow = Fellow('Imran', 4334)
+        self.assertEqual(
+            'FELLOW (id:4334 name:IMRAN office:None living:None '
+            'accommodation:N', repr(fellow))
+
+    # def test_room_functionality(self):
+    #     """Test room functionality."""
+    #     with self.assertRaises(TypeError):
+    #         Room("Mida")
+    #     office = Office('Ramire', 1001, ['samuel', 'ali', 'sam', 'Idi'])
+
     def test_creates_room(self):
         """Test rooms are created successfully."""
-        # Cannot create rooms with abstract class Room
-        with self.assertRaises(TypeError):
-            Room("Mida")
         # captures invalid input
         # Room type
         msg = self.amity.create_room(["Mida"], "Other_type")
@@ -241,6 +257,13 @@ class AmityTests(unittest.TestCase):
 
     def test_save_state(self):
         """Test states are saved successfully."""
+        self.amity.create_room(['Swift', 'Jaudi'], 'office')
+        self.amity.create_room(['Zimer', 'Roysa'], 'living')
+        self.amity.add_person('Ali', 'staff')
+        self.amity.add_person('Omar', 'staff')
+        self.amity.add_person('Subira', 'staff')
+        self.amity.add_person('Ridhaa', 'fellow')
+        self.amity.add_person('Salma', 'fellow', 'Y')
         self.assertTrue(self.amity.save_state('testdata.db') ==
                         'save successful')
         self.assertTrue(os.path.exists('databases/testdata.db'), 'True')
@@ -249,7 +272,6 @@ class AmityTests(unittest.TestCase):
         """Test loads data from database."""
         self.assertEqual(str(self.amity.load_state('nonexistent.db')),
                          'database does not exist')
-        self.amity.create_room(['Lina', 'Tina'], 'office')
         self.assertEqual(self.amity.load_state('amity_default.db'),
                          'Operation complete')
 

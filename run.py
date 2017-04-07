@@ -77,8 +77,6 @@ class MyInteractive (cmd.Cmd):
     prompt = 'Amity-->>> '
     file = None
     amity = Amity()
-    # load previous state
-    # amity.load_state()
 
     @docopt_cmd
     def do_create_room(self, arg):

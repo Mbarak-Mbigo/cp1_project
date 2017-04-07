@@ -35,15 +35,7 @@ class Person(metaclass=ABCMeta):
 
     @abstractmethod
     def __str__(self):
-        """Docstring for str."""
-        pass
-
-    def allocated_office(self):
-        """Return true if allocated."""
-        if self.office_space:
-            return True
-        else:
-            return False
+        """String representation of object person."""
 
 
 class Staff(Person):
@@ -78,10 +70,10 @@ class Fellow(Person):
 
     def __repr__(self):
         """Defining object representation."""
-        return '{0} (id:{1} name:{2} office:{3} living:{4}\
-        accommodation:{5}'.format(self.role, self.id, self.name,
-                                  self.office_space, self.living_space,
-                                  self.accommodation)
+        return '{0} (id:{1} name:{2} office:{3} living:{4} '\
+            'accommodation:{5}'.format(self.role, self.id, self.name,
+                                       self.office_space, self.living_space,
+                                       self.accommodation)
 
     def __str__(self):
         """String representation."""
