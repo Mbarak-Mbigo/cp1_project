@@ -10,6 +10,7 @@ Process:
 # imports
 import unittest
 from unittest.mock import patch
+import os
 
 # local imports
 from app.amity import Amity
@@ -240,7 +241,9 @@ class AmityTests(unittest.TestCase):
 
     def test_save_state(self):
         """Test states are saved successfully."""
-        self.assertTrue(self.amity.save_state() == 'save successful')
+        self.assertTrue(self.amity.save_state('testdata.db') ==
+                        'save successful')
+        self.assertTrue(os.path.exists('databases/testdata.db'), 'True')
 
     def test_load_state(self):
         """Test loads data from database."""
