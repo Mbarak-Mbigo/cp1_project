@@ -123,6 +123,7 @@ def load_living(dictliving, cur):
         for record in records:
             dictliving[record[1]] = Living(record[1], record[0],
                                            literal_eval(record[3]))
+        cprint('Living rooms data loaded successfully.', 'green')
 
 
 def save_staff(dictstaff, cur):
@@ -154,6 +155,7 @@ def load_staff(dictstaff, cur):
         records = cur.fetchall()
         for record in records:
             dictstaff[record[1]] = Staff(record[1], record[0], record[3])
+        cprint('staff data loaded successfully.', 'green')
 
 
 def save_fellow(dictfellow, cur):
@@ -189,3 +191,4 @@ def load_fellow(dictfellow, cur):
         for record in records:
             dictfellow[record[1]] = Fellow(record[1], record[0], record[3],
                                            record[5], record[4])
+        cprint('Fellows data loaded successfully.', 'green')
