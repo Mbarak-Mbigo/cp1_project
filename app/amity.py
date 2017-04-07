@@ -681,7 +681,6 @@ class Amity(object):
         else:
             # db exists
             conn = db.create_connection(dbpath)
-            cur = None
             if conn:
                 all_pple = self._get_all_pple()
                 all_rooms = self._get_all_rooms()
@@ -690,9 +689,12 @@ class Amity(object):
                     self.rooms['livingspaces'] = dict()
                     self.persons['staff'] = dict()
                     self.persons['fellows'] = dict()
-                else:
-                    cur = conn.cursor()
-                return db.load(self.rooms, self.persons, cur)
+                cur = conn.cursor()
+                db.load_office(self.rooms['offices'], cur)
+                db.load_living(self.rooms['livingspaces'], cur)
+                db.load_staff(self.persons['staff'], cur)
+                db.load_fellow(self.persons['fellows'], cur)
+                return 'Operation complete'
             else:
                 cprint('Invalid Connection', 'red')
         finally:

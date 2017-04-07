@@ -255,8 +255,8 @@ class AmityTests(unittest.TestCase):
         self.assertTrue(str(self.amity.print_available_space()),
                         'success')
 
-    def test_save_state(self):
-        """Test states are saved successfully."""
+    def test_database_functionality(self):
+        """Test database functionality."""
         self.amity.create_room(['Swift', 'Jaudi'], 'office')
         self.amity.create_room(['Zimer', 'Roysa'], 'living')
         self.amity.add_person('Ali', 'staff')
@@ -267,16 +267,13 @@ class AmityTests(unittest.TestCase):
         self.assertTrue(self.amity.save_state('testdata.db') ==
                         'save successful')
         self.assertTrue(os.path.exists('databases/testdata.db'), 'True')
-
-    def test_load_state(self):
-        """Test loads data from database."""
         self.assertEqual(str(self.amity.load_state('nonexistent.db')),
                          'database does not exist')
         # Handles nonexistent databases well
         self.assertEqual(str(self.amity.load_state('testda.db')),
                          'database does not exist')
-        self.assertEqual(self.amity.load_state('testdata.db'), 'Operation successful')
-
+        self.assertEqual(self.amity.load_state('testdata.db'),
+                         'Operation complete')
 
 if __name__ == '__main__':
     unittest.main()
