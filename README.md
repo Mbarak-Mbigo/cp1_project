@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Mbarak-Mbigo/cp1_project.svg?branch=develop)](https://travis-ci.org/Mbarak-Mbigo/cp1_project) [![Code Climate](https://codeclimate.com/github/Mbarak-Mbigo/cp1_project/badges/gpa.svg)](https://codeclimate.com/github/Mbarak-Mbigo/cp1_project) [![Test Coverage](https://codeclimate.com/github/Mbarak-Mbigo/cp1_project/badges/coverage.svg)](https://codeclimate.com/github/Mbarak-Mbigo/cp1_project/coverage)
+[![Build Status](https://travis-ci.org/Mbarak-Mbigo/cp1_project.svg?branch=develop)](https://travis-ci.org/Mbarak-Mbigo/cp1_project)  [![Test Coverage](https://codeclimate.com/github/Mbarak-Mbigo/cp1_project/badges/coverage.svg)](https://codeclimate.com/github/Mbarak-Mbigo/cp1_project/coverage)
 
 
 # PROJECT: AMITY
